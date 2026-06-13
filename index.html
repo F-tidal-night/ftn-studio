@@ -2,8 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>FTN Studio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>FTN Studio · 甜酷锐意</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,200;14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
@@ -259,21 +259,21 @@
             z-index: 1010;
         }
         .close-overlay:hover { background: #c084fc; color: #0a0a0a; }
-        /* 核心改动：放弃 Grid，改用 Flex 布局 */
+        /* 作品网格使用 Flex 布局，稳定可靠 */
         .works-grid {
             display: flex;
             flex-wrap: wrap;
             gap: 2rem;
-            align-content: flex-start;
+            justify-content: center;
             width: 85%;
             max-width: 1200px;
             max-height: 80vh;
             overflow-y: auto;
             padding: 2rem;
-            transform: none; /* 移除不必要的变换 */
         }
         .work-card {
-            flex: 0 0 calc(25% - 1.5rem); /* 默认四列，减去 gap 的一半调整 */
+            flex: 0 0 calc(25% - 1.5rem);
+            min-width: 200px;
             background: #1e172a;
             border-radius: 20px;
             overflow: hidden;
@@ -282,7 +282,6 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
-            contain: layout paint; /* 性能优化 */
         }
         .work-card img {
             width: 100%;
@@ -290,7 +289,6 @@
             object-fit: cover;
             display: block;
             background: #2a1a3a;
-            flex-shrink: 0;
         }
         .work-card .work-title {
             padding: 12px;
@@ -298,38 +296,36 @@
             text-align: center;
             background: rgba(0,0,0,0.5);
             color: #f0e6ff;
-            flex-shrink: 0;
         }
         .work-card:hover {
             transform: translateY(-8px);
             box-shadow: 0 15px 30px rgba(200,100,255,0.4);
             border: 1px solid rgba(200,100,255,0.6);
         }
-        /* 响应式列数调整 */
-        @media (max-width: 1000px) {
-            .work-card { flex: 0 0 calc(33.33% - 1.5rem); }
-        }
-        @media (max-width: 700px) {
-            .work-card { flex: 0 0 calc(50% - 1rem); }
-        }
-        @media (max-width: 450px) {
-            .work-card { flex: 0 0 100%; }
-        }
-        /* 其余样式保持不变 */
-        .detail-overlay {
+        /* 详情页关闭按钮优化（始终可见） */
+        .close-detail {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: #08040e;
-            z-index: 2000;
-            visibility: hidden;
-            opacity: 0;
-            transition: opacity 0.3s;
+            top: 20px;
+            right: 20px;
+            z-index: 2001;
+            background: rgba(0,0,0,0.6);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: 0.2s;
         }
-        .detail-overlay.active { visibility: visible; opacity: 1; }
+        .close-detail:hover {
+            background: rgba(200,100,255,0.8);
+            transform: scale(1.05);
+        }
         .detail-container {
             display: flex;
             width: 90%;
@@ -341,6 +337,7 @@
             overflow: hidden;
             backdrop-filter: blur(20px);
             border: 1px solid rgba(200,100,255,0.3);
+            position: relative;
         }
         .detail-image {
             flex: 1.2;
@@ -358,6 +355,64 @@
             object-fit: contain;
             transition: opacity 0.2s;
         }
+        .detail-info {
+            flex: 0.8;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 20px;
+            overflow-y: auto;
+        }
+        /* 手机端适配 */
+        @media (max-width: 800px) {
+            .logo-img { width: 120px; }
+            .logo-text { font-size: 1.6rem; letter-spacing: 3px; margin-left: 12px; }
+            .story-section { padding: 10vh 5%; }
+            .story-text { max-width: 100%; font-size: 0.95rem; }
+            .category-carousel-card { width: 180px; }
+            .category-carousel-card.center { width: 240px; }
+            .carousel-arrow { width: 36px; height: 36px; font-size: 1.5rem; }
+            .works-grid { gap: 1rem; padding: 1rem; width: 95%; }
+            .work-card { flex: 0 0 calc(50% - 0.5rem); min-width: 0; }
+            .detail-container {
+                flex-direction: column;
+                width: 95%;
+                max-height: 90vh;
+            }
+            .detail-image { flex: none; }
+            .carousel-img { max-height: 40vh; }
+            .detail-info { padding: 20px; max-height: 50vh; }
+            .close-detail {
+                top: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+                background: rgba(0,0,0,0.7);
+            }
+        }
+        @media (max-width: 480px) {
+            .work-card { flex: 0 0 100%; }
+            .category-carousel-card { width: 140px; }
+            .category-carousel-card.center { width: 200px; }
+            .carousel-arrow { width: 30px; height: 30px; font-size: 1.2rem; }
+            .slogan { font-size: 0.8rem; letter-spacing: 4px; }
+        }
+        .detail-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #08040e;
+            z-index: 2000;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .detail-overlay.active { visibility: visible; opacity: 1; }
         .carousel-arrow-detail {
             position: absolute;
             top: 50%;
@@ -394,17 +449,6 @@
             cursor: pointer;
         }
         .carousel-dot.active { background: #f0a6ff; transform: scale(1.3); }
-        .detail-info {
-            flex: 0.8;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 20px;
-            overflow-y: auto;
-        }
-        .detail-info h2 { font-size: 2rem; font-weight: 500; letter-spacing: 2px; }
-        .detail-info p { font-size: 1rem; line-height: 1.6; color: #ccc; }
         .work-detail-link {
             display: inline-block;
             margin-top: 20px;
@@ -419,27 +463,6 @@
             transition: transform 0.2s, box-shadow 0.2s;
             text-align: center;
             align-self: flex-start;
-        }
-        .close-detail {
-            position: absolute;
-            top: 30px; right: 40px;
-            background: rgba(0,0,0,0.5);
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            width: 48px; height: 48px;
-            border-radius: 50%;
-            backdrop-filter: blur(4px);
-        }
-        @media (max-width: 800px) {
-            .detail-container { flex-direction: column; height: auto; min-height: 60vh; max-height: none; }
-            .detail-info { padding: 20px; }
-            .logo-img { width: 120px; }
-            .logo-text { font-size: 1.6rem; letter-spacing: 3px; margin-left: 12px; }
-            .category-carousel-card { width: 180px; }
-            .category-carousel-card.center { width: 240px; }
-            .carousel-arrow { width: 36px; height: 36px; font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -484,9 +507,7 @@
 </div>
 
 <script>
-    // ---------- 以下是你原有的完整脚本，请确保已完整复制，此处仅作占位 ----------
-    // 重要：使用你当前稳定运行的 index.html 中的 script 内容替换下面内容
-    // 为了让你快速测试，我会把之前正常的脚本附上，但你最好从原文件复制
+    // ---------- 数据加载与核心逻辑（完整版）----------
     let appData = null;
     let currentCategoryWorks = [];
     let carouselIndex = 0;
@@ -594,7 +615,21 @@
         }
     }
     
-    function getPlaceholderData() { return { categories: [] }; }
+    function getPlaceholderData() {
+        return {
+            studioName: "FTN STUDIO",
+            slogan: "致力于向世界展示不务正业的热爱",
+            story: "<p>花汐夜（Flower·Tidal·Night）这个名字诞生于2020年，没有宏大的注脚，只是三个喜欢的意象：花朵、潮汐、夜晚。很久之后才明白，这种不计较含义、只凭直觉的冲动，叫做少年心气，而它永远留在了那个开始的地方。</p><p>2026年，创始人F-tidal night重新审视过往各领域作品，推倒重做了曾经稚嫩的LOGO，并将散落的设计语言规整为统一的体系。于是，FTN Studio诞生了。它不止是一个名字的缩写，更是一种宣言：向世界展示不务正业的热爱。</p><p>人生从来没有所谓的终极意义。读书、上班、结婚、生子不是人生的标准答案，也不该成为衡量人生价值的唯一尺度。相比追逐某种既定轨迹，我们更愿意相信，每个人都应该拥有拥抱热爱、探索自我的勇气。</p><p>FTN Studio 是一个持续生长的个人创作品牌。这里汇集音乐、绘画、摄影、服装、视觉设计等不同领域的创作实践，也记录那些尚未完成的想法、灵感与实验。对于 FTN Studio 而言，每一种媒介都是情绪的容器，每一次创作都是情绪的裂变，也是对自我边界的一次探索。如果你也曾在某个时刻，为一段旋律驻足，为一张画沉默，为一道光影心动，或因为一件衣服而记住某段记忆，那么我们或许早已见过面。</p><p>那份诞生于2020年的少年心气，或许早已改变了模样，但它依然驱使着我们不断创作、表达。</p><p>欢迎来到 FTN Studio，这里没有标准答案，只有持续生长的热爱。</p>",
+            storyImage: "images/story.webp",
+            categories: [
+                { id: "music", title: "音乐", cover: "images/covers/music.webp", works: [] },
+                { id: "illust", title: "绘画", cover: "images/covers/illust.webp", works: [] },
+                { id: "photo", title: "摄影", cover: "images/covers/photo.webp", works: [] },
+                { id: "fashion", title: "服装设计", cover: "images/covers/fashion.webp", works: [] },
+                { id: "other", title: "其他", cover: "images/covers/other.webp", works: [] }
+            ]
+        };
+    }
     
     function initParticles() {
         particlesJS("particles-js", {
@@ -678,7 +713,6 @@
         category.works.forEach((work, idx) => {
             const card = document.createElement('div');
             card.className = 'work-card';
-            
             let imgUrl = work.src;
             if (!imgUrl && work.images && work.images.length > 0) {
                 imgUrl = work.images[0];
@@ -688,7 +722,6 @@
             img.alt = work.title || '作品';
             img.loading = 'lazy';
             img.decoding = 'async';
-            
             let displayTitle = work.title;
             if (!displayTitle || displayTitle.trim() === '') {
                 console.warn(`分类 ${catId} 中作品 ${idx+1} 缺少 title`, work);
@@ -697,7 +730,6 @@
             const titleDiv = document.createElement('div');
             titleDiv.className = 'work-title';
             titleDiv.textContent = displayTitle;
-            
             card.appendChild(img);
             card.appendChild(titleDiv);
             card.addEventListener('click', () => openWorkDetail(idx));
@@ -854,7 +886,7 @@
         function resumeBreathingGlow() { if (window.scrollY >= 200) return; if (!isGlowing) { isGlowing = true; startBreathingGlow(); } else if (glowAnimation && glowAnimation.paused()) glowAnimation.play(); }
         window.addEventListener('scroll', () => { if (window.scrollY < 200) resumeBreathingGlow(); else stopBreathingGlow(); });
         
-        // 粒子消散动画（完整保留）
+        // 粒子消散动画
         const heroSection = document.getElementById('hero');
         const slogan = document.getElementById('sloganText');
         const fxCanvas = document.getElementById('fx-canvas');
