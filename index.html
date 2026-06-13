@@ -368,6 +368,7 @@
                 font-size: 1.6rem; 
                 letter-spacing: 3px; 
                 margin-left: 12px;
+                /* 修复渐变异常 */
                 background: linear-gradient(120deg, #ffffff, #d9b4ff) !important;
                 -webkit-background-clip: text !important;
                 background-clip: text !important;
@@ -874,7 +875,7 @@
         const tl = gsap.timeline();
         tl.to(logo, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out", delay: 0.3 })
           .to(logo, { scale: 1.02, duration: 0.8, repeat: 1, yoyo: true, ease: "power1.inOut", onComplete: () => gsap.set(logo, { scale: 1 }) }, "-=0.8")
-          // 手机端左移距离 -107
+          // 手机端左移距离 -106（你调整后居中的值）
           .to(brandWrapper, { 
               x: window.innerWidth <= 800 ? -107 : -180, 
               duration: 1.2, 
