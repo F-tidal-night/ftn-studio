@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>FTN Studio</title>
+    <title>FTN Studio · 甜酷锐意</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,200;14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
@@ -259,7 +259,7 @@
             z-index: 1010;
         }
         .close-overlay:hover { background: #c084fc; color: #0a0a0a; }
-        /* 作品网格使用 Flex 布局，稳定可靠 */
+        /* 作品网格 Flex 布局 */
         .works-grid {
             display: flex;
             flex-wrap: wrap;
@@ -302,7 +302,6 @@
             box-shadow: 0 15px 30px rgba(200,100,255,0.4);
             border: 1px solid rgba(200,100,255,0.6);
         }
-        /* 详情页关闭按钮优化（始终可见） */
         .close-detail {
             position: fixed;
             top: 20px;
@@ -367,7 +366,16 @@
         /* 手机端适配 */
         @media (max-width: 800px) {
             .logo-img { width: 120px; }
-            .logo-text { font-size: 1.6rem; letter-spacing: 3px; margin-left: 12px; }
+            .logo-text { 
+                font-size: 1.6rem; 
+                letter-spacing: 3px; 
+                margin-left: 12px;
+                /* 修复渐变方向异常 */
+                background: linear-gradient(120deg, #ffffff, #d9b4ff) !important;
+                -webkit-background-clip: text !important;
+                background-clip: text !important;
+                color: transparent !important;
+            }
             .story-section { padding: 10vh 5%; }
             .story-text { max-width: 100%; font-size: 0.95rem; }
             .category-carousel-card { width: 180px; }
@@ -507,7 +515,6 @@
 </div>
 
 <script>
-    // ---------- 数据加载与核心逻辑（完整版）----------
     let appData = null;
     let currentCategoryWorks = [];
     let carouselIndex = 0;
@@ -870,11 +877,12 @@
         const tl = gsap.timeline();
         tl.to(logo, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out", delay: 0.3 })
           .to(logo, { scale: 1.02, duration: 0.8, repeat: 1, yoyo: true, ease: "power1.inOut", onComplete: () => gsap.set(logo, { scale: 1 }) }, "-=0.8")
+          // 手机端左移距离改为 -106（你调整后的值），电脑端保持 -180
           .to(brandWrapper, { 
-    x: window.innerWidth <= 800 ? -105 : -180, 
-    duration: 1.2, 
-    ease: "power3.out" 
-}, "+=1")
+              x: window.innerWidth <= 800 ? -106 : -180, 
+              duration: 1.2, 
+              ease: "power3.out" 
+          }, "+=1")
           .to(nameSpan, { opacity: 1, x: 0, duration: 1.2, ease: "power3.out" }, "<")
           .to('#sloganText', { opacity: 1, y: 0, boxShadow: "0 0 18px rgba(200,100,255,0.5)", duration: 0.6, ease: "power2.out" }, "+=0.4")
           .to('#scrollHint', { width: '80%', duration: 1, ease: "power1.inOut" }, "-=0.4")
@@ -890,7 +898,7 @@
         function resumeBreathingGlow() { if (window.scrollY >= 200) return; if (!isGlowing) { isGlowing = true; startBreathingGlow(); } else if (glowAnimation && glowAnimation.paused()) glowAnimation.play(); }
         window.addEventListener('scroll', () => { if (window.scrollY < 200) resumeBreathingGlow(); else stopBreathingGlow(); });
         
-        // 粒子消散动画
+        // 粒子消散动画（完整保留）
         const heroSection = document.getElementById('hero');
         const slogan = document.getElementById('sloganText');
         const fxCanvas = document.getElementById('fx-canvas');
