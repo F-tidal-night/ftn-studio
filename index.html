@@ -311,8 +311,7 @@
             color: white;
             font-size: 1.5rem;
             cursor: pointer;
-            width: 48px;
-            height: 48px;
+            width: 48px; height: 48px;
             border-radius: 50%;
             backdrop-filter: blur(4px);
             display: flex;
@@ -486,7 +485,7 @@
                 <span class="logo-text" id="mainName">FTN STUDIO</span>
             </div>
         </div>
-        <div class="slogan" id="sloganText">FTN Studio</div>
+        <div class="slogan" id="sloganText">致力于向世界展示不务正业的热爱</div>
         <div class="scroll-hint" id="scrollHint"></div>
     </section>
 
@@ -623,7 +622,7 @@
     function getPlaceholderData() {
         return {
             studioName: "FTN STUDIO",
-            slogan: "FTN Studio",
+            slogan: "致力于向世界展示不务正业的热爱",
             story: "<p>花汐夜（Flower·Tidal·Night）这个名字诞生于2020年，没有宏大的注脚，只是三个喜欢的意象：花朵、潮汐、夜晚。很久之后才明白，这种不计较含义、只凭直觉的冲动，叫做少年心气，而它永远留在了那个开始的地方。</p><p>2026年，创始人F-tidal night重新审视过往各领域作品，推倒重做了曾经稚嫩的LOGO，并将散落的设计语言规整为统一的体系。于是，FTN Studio诞生了。它不止是一个名字的缩写，更是一种宣言：向世界展示不务正业的热爱。</p><p>人生从来没有所谓的终极意义。读书、上班、结婚、生子不是人生的标准答案，也不该成为衡量人生价值的唯一尺度。相比追逐某种既定轨迹，我们更愿意相信，每个人都应该拥有拥抱热爱、探索自我的勇气。</p><p>FTN Studio 是一个持续生长的个人创作品牌。这里汇集音乐、绘画、摄影、服装、视觉设计等不同领域的创作实践，也记录那些尚未完成的想法、灵感与实验。对于 FTN Studio 而言，每一种媒介都是情绪的容器，每一次创作都是情绪的裂变，也是对自我边界的一次探索。如果你也曾在某个时刻，为一段旋律驻足，为一张画沉默，为一道光影心动，或因为一件衣服而记住某段记忆，那么我们或许早已见过面。</p><p>那份诞生于2020年的少年心气，或许早已改变了模样，但它依然驱使着我们不断创作、表达。</p><p>欢迎来到 FTN Studio，这里没有标准答案，只有持续生长的热爱。</p>",
             storyImage: "images/story.webp",
             categories: [
@@ -859,8 +858,7 @@
         initParticles();
         document.getElementById('storyTextArea').innerHTML = appData.story;
         document.getElementById('mainName').innerText = appData.studioName;
-        // 强制 slogan 显示为 FTN Studio，不依赖 data.json
-        document.getElementById('sloganText').innerText = "FTN Studio";
+        document.getElementById('sloganText').innerText = appData.slogan;
         categories = appData.categories;
         carouselIndex = 0;
         renderCarousel();
@@ -876,7 +874,7 @@
         const tl = gsap.timeline();
         tl.to(logo, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out", delay: 0.3 })
           .to(logo, { scale: 1.02, duration: 0.8, repeat: 1, yoyo: true, ease: "power1.inOut", onComplete: () => gsap.set(logo, { scale: 1 }) }, "-=0.8")
-          // 手机端左移距离改为 -107
+          // 手机端左移距离 -107
           .to(brandWrapper, { 
               x: window.innerWidth <= 800 ? -107 : -180, 
               duration: 1.2, 
