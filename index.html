@@ -11,529 +11,987 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <style>
-        /* 所有样式保持不变，略……（因篇幅，此处省略，实际使用时请复制完整的样式） */
-        /* 为了节省空间，这里只展示关键修改部分，但最终回答中我会提供完整代码 */
+        /* ===== 完全保留 V2 的样式（未改动） ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        body {
+            background-color: #0a0a0a;
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            color: #f0f0f0;
+            overflow-x: hidden;
+            cursor: none;
+            background: radial-gradient(circle at 30% 40%, #1a0b1f, #0a0a0a);
+            will-change: background;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #1a1a2a; }
+        ::-webkit-scrollbar-thumb { background: #b77dff; border-radius: 4px; }
+        #particles-js { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .cursor-glow {
+            position: fixed;
+            width: 60px; height: 60px;
+            background: radial-gradient(circle, rgba(180, 100, 255, 0.4) 0%, rgba(180, 100, 255, 0) 80%);
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s;
+            will-change: left, top;
+        }
+        .loading-bar {
+            position: fixed;
+            top: 0; left: 0;
+            width: 0%; height: 2px;
+            background: linear-gradient(90deg, #c084fc, #f0a6ff);
+            z-index: 10000;
+            transition: width 0.2s ease;
+        }
+        section {
+            position: relative;
+            width: 100%; min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: transparent;
+            z-index: 1;
+        }
+        .hero { flex-direction: column; position: relative; }
+        .hero-center { position: relative; display: flex; justify-content: center; width: 100%; }
+        .brand-wrapper { position: relative; display: inline-block; }
+        .logo-img { width: 200px; height: auto; display: block; opacity: 0; transform: scale(0.95); }
+        .logo-text {
+            position: absolute;
+            left: 100%; margin-left: 20px;
+            top: 50%;
+            transform: translateY(-50%) translateX(10px);
+            white-space: nowrap;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 2.5rem;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, #ffffff, #d9b4ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            -webkit-text-fill-color: transparent; /* V2 修复 */
+            opacity: 0;
+            transition: none;
+        }
+        .slogan {
+            margin-top: 40px;
+            font-size: 1rem;
+            font-weight: 300;
+            letter-spacing: 8px;
+            color: #ddd;
+            text-transform: uppercase;
+            background: rgba(200,100,255,0.08);
+            padding: 10px 24px;
+            border-radius: 60px;
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        .scroll-hint {
+            position: absolute;
+            bottom: 40px; left: 50%;
+            transform: translateX(-50%);
+            width: 0%; height: 1px;
+            background: linear-gradient(90deg, transparent, #c084fc, #f0a6ff, transparent);
+        }
+        #fx-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 6;
+        }
+        .story-section {
+            padding: 10vh 8%;
+            display: flex;
+            gap: 60px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            position: relative;
+            z-index: 2;
+        }
+        .story-text {
+            flex: 1.2;
+            max-width: 1000px;
+            margin: 0 auto;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            font-weight: 300;
+            color: #e0d4ff;
+        }
+        .story-text p { margin-bottom: 1.5rem; }
+        .carousel-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4rem 2rem;
+            position: relative;
+            z-index: 2;
+        }
+        .carousel-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .carousel-track {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            overflow-x: visible;
+            padding: 1rem 0;
+            will-change: transform;
+            transform: translateZ(0);
+        }
+        .category-carousel-card {
+            flex-shrink: 0;
+            width: 240px;
+            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            cursor: default;
+            border-radius: 24px;
+            overflow: hidden;
+            background: rgba(20, 12, 35, 0.6);
+            border: 1px solid rgba(200, 100, 255, 0.3);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+            position: relative;
+            transform: translateZ(0);
+        }
+        .category-carousel-card.center {
+            width: 320px;
+            transform: scale(1.1);
+            border-color: #f0a6ff;
+            box-shadow: 0 20px 40px rgba(200,100,255,0.4);
+            z-index: 3;
+            cursor: pointer;
+        }
+        .category-carousel-card.center:hover {
+            transform: scale(1.15);
+            box-shadow: 0 30px 50px rgba(200,100,255,0.6);
+            transition: all 0.3s ease;
+        }
+        .category-carousel-card.left,
+        .category-carousel-card.right {
+            opacity: 0.65;
+            transform: scale(0.85);
+            cursor: default;
+        }
+        .category-carousel-card img {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+            display: block;
+        }
+        .category-carousel-card .card-title {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            text-align: center;
+            padding: 1rem;
+            font-weight: 600;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            color: #f0e6ff;
+            text-shadow: 0 0 8px rgba(200,100,255,0.5);
+        }
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px; height: 48px;
+            background: rgba(20, 12, 35, 0.85);
+            border: 1px solid rgba(200,100,255,0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 10;
+            color: #f0a6ff;
+            font-size: 2rem;
+            font-weight: 300;
+            line-height: 1;
+            transform: translateY(calc(-50% - 6px));
+        }
+        .carousel-arrow:hover {
+            background: rgba(200,100,255,0.6);
+            transform: translateY(calc(-50% - 6px)) scale(1.05);
+        }
+        .carousel-arrow.left { left: 0; }
+        .carousel-arrow.right { right: 0; }
+        .overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(5, 2, 15, 0.96);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.4s, visibility 0s 0.4s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .overlay.active { visibility: visible; opacity: 1; transition: opacity 0.4s; }
+        .close-overlay {
+            position: fixed;
+            top: 30px; right: 40px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid #c084fc;
+            padding: 10px 28px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 400;
+            backdrop-filter: blur(4px);
+            transition: 0.2s;
+            z-index: 1010;
+        }
+        .close-overlay:hover { background: #c084fc; color: #0a0a0a; }
+        /* V2 使用 Grid 布局 */
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 2rem;
+            width: 85%;
+            max-width: 1200px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 2rem;
+            justify-items: start;
+            align-items: start;
+        }
+        .work-card {
+            background: #1e172a;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+        .work-card img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            display: block;
+            background: #2a1a3a;
+        }
+        .work-card .work-title {
+            padding: 12px;
+            font-size: 0.9rem;
+            text-align: center;
+            background: rgba(0,0,0,0.5);
+            color: #f0e6ff;
+        }
+        .work-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(200,100,255,0.4);
+            border: 1px solid rgba(200,100,255,0.6);
+        }
+        .close-detail {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2001;
+            background: rgba(0,0,0,0.6);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .close-detail:hover {
+            background: rgba(200,100,255,0.8);
+            transform: scale(1.05);
+        }
+        .detail-container {
+            display: flex;
+            width: 90%;
+            max-width: 1400px;
+            min-height: 60vh;
+            max-height: 90vh;
+            background: rgba(20, 12, 35, 0.9);
+            border-radius: 32px;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(200,100,255,0.3);
+            position: relative;
+        }
+        .detail-image {
+            flex: 1.2;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .carousel-img {
+            max-width: 100%;
+            max-height: 70vh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            transition: opacity 0.2s;
+        }
+        .detail-info {
+            flex: 0.8;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 20px;
+            overflow-y: auto;
+        }
+        .detail-info h2 { font-size: 2rem; font-weight: 500; letter-spacing: 2px; }
+        .detail-info p { font-size: 1rem; line-height: 1.6; color: #ccc; }
+        .work-detail-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 24px;
+            background: linear-gradient(90deg, #c084fc, #f0a6ff);
+            border-radius: 40px;
+            text-decoration: none;
+            color: #0a0a0a;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-align: center;
+            align-self: flex-start;
+        }
+        .detail-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #08040e;
+            z-index: 2000;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .detail-overlay.active { visibility: visible; opacity: 1; }
+        .carousel-arrow-detail {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px; height: 40px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 1.5rem;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+        .carousel-arrow-detail:hover { background: rgba(200,100,255,0.6); transform: translateY(-50%) scale(1.1); }
+        .carousel-arrow-detail.left { left: 20px; }
+        .carousel-arrow-detail.right { right: 20px; }
+        .carousel-indicators {
+            position: absolute;
+            bottom: 15px;
+            left: 0; right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            z-index: 10;
+        }
+        .carousel-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .carousel-dot.active { background: #f0a6ff; transform: scale(1.3); }
+        /* V2 移动端适配 */
+        @media (max-width: 800px) {
+            .logo-img { width: 120px; }
+            .logo-text {
+                font-size: 1.6rem;
+                letter-spacing: 3px;
+                margin-left: 12px;
+                background: linear-gradient(120deg, #ffffff, #d9b4ff) !important;
+                -webkit-background-clip: text !important;
+                background-clip: text !important;
+                color: transparent !important;
+                -webkit-text-fill-color: transparent !important;
+            }
+            .story-section { padding: 10vh 5%; }
+            .story-text { max-width: 100%; font-size: 0.95rem; }
+            .category-carousel-card { width: 180px; }
+            .category-carousel-card.center { width: 240px; }
+            .carousel-arrow { width: 36px; height: 36px; font-size: 1.5rem; }
+            .works-grid {
+                gap: 1rem;
+                padding: 1rem;
+                width: 95%;
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            }
+            .work-card { min-width: 0; }
+            .detail-container {
+                flex-direction: column;
+                width: 95%;
+                max-height: 90vh;
+            }
+            .detail-image { flex: none; }
+            .carousel-img { max-height: 40vh; }
+            .detail-info { padding: 20px; max-height: 50vh; }
+            .close-detail {
+                top: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+                background: rgba(0,0,0,0.7);
+            }
+        }
+        @media (max-width: 480px) {
+            .works-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+            .category-carousel-card { width: 140px; }
+            .category-carousel-card.center { width: 200px; }
+            .carousel-arrow { width: 30px; height: 30px; font-size: 1.2rem; }
+            .slogan { font-size: 0.8rem; letter-spacing: 4px; }
+        }
     </style>
 </head>
 <body>
-    <!-- 页面结构保持不变，但 Logo 图片的 src 将由 JS 动态设置 -->
-    <div id="particles-js"></div>
-    <div class="loading-bar" id="loadingBar"></div>
-    <div class="cursor-glow" id="cursorGlow"></div>
-    <canvas id="fx-canvas"></canvas>
+<div id="particles-js"></div>
+<div class="loading-bar" id="loadingBar"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
+<canvas id="fx-canvas"></canvas>
 
-    <main>
-        <section class="hero" id="hero">
-            <div class="hero-center">
-                <div class="brand-wrapper" id="brandWrapper">
-                    <!-- 注意：此处 src 为空，由 JS 设置 -->
-                    <img src="" alt="FTN Logo" class="logo-img" id="mainLogo">
-                    <span class="logo-text" id="mainName">FTN STUDIO</span>
-                </div>
+<main>
+    <section class="hero" id="hero">
+        <div class="hero-center">
+            <div class="brand-wrapper" id="brandWrapper">
+                <img src="" alt="FTN Logo" class="logo-img" id="mainLogo"> <!-- src 由 JS 设置 -->
+                <span class="logo-text" id="mainName">FTN STUDIO</span>
             </div>
-            <div class="slogan" id="sloganText">致力于向世界展示不务正业的热爱</div>
-            <div class="scroll-hint" id="scrollHint"></div>
-        </section>
+        </div>
+        <div class="slogan" id="sloganText">致力于向世界展示不务正业的热爱</div>
+        <div class="scroll-hint" id="scrollHint"></div>
+    </section>
 
-        <section class="story-section" id="storySection">
-            <div class="story-text" id="storyTextArea"></div>
-        </section>
+    <section class="story-section" id="storySection">
+        <div class="story-text" id="storyTextArea"></div>
+    </section>
 
-        <section class="carousel-section" id="carouselSection">
-            <div class="carousel-container">
-                <div class="carousel-arrow left" id="carouselLeft">‹</div>
-                <div class="carousel-track" id="carouselTrack"></div>
-                <div class="carousel-arrow right" id="carouselRight">›</div>
-            </div>
-        </section>
-    </main>
+    <section class="carousel-section" id="carouselSection">
+        <div class="carousel-container">
+            <div class="carousel-arrow left" id="carouselLeft">‹</div>
+            <div class="carousel-track" id="carouselTrack"></div>
+            <div class="carousel-arrow right" id="carouselRight">›</div>
+        </div>
+    </section>
+</main>
 
-    <div class="overlay" id="worksOverlay">
-        <div class="close-overlay" id="closeOverlay">⟵ 返回</div>
-        <div class="works-grid" id="worksGrid"></div>
-    </div>
-    <div class="detail-overlay" id="detailOverlay">
-        <button class="close-detail" id="closeDetail">✕</button>
-        <div class="detail-container" id="detailContainer"></div>
-    </div>
+<div class="overlay" id="worksOverlay">
+    <div class="close-overlay" id="closeOverlay">⟵ 返回</div>
+    <div class="works-grid" id="worksGrid"></div>
+</div>
+<div class="detail-overlay" id="detailOverlay">
+    <button class="close-detail" id="closeDetail">✕</button>
+    <div class="detail-container" id="detailContainer"></div>
+</div>
 
-    <script>
-        // ============================================================
-        //  🚀 只需修改这一行：改为您的 Cloudflare 图床根地址
-        //  注意：末尾请加 "/" 
-        // ============================================================
-        const IMAGE_BASE_URL = 'https://images.ftn-studio.top/';   // ← 请替换为您的 CDN 地址
+<script>
+    // ================================================================
+    //  🔧 配置区：只需修改此处为您的 CDN 根地址（末尾加 /）
+    // ================================================================
+    const IMAGE_BASE_URL = 'https://images.ftn-studio.top/';  // 您的图床地址
 
-        // ---------- 以下脚本与之前一致，但加入了图片路径自动替换功能 ----------
-        let appData = null;
-        let currentCategoryWorks = [];
-        let carouselIndex = 0;
-        let categories = [];
-        let carouselCardNodes = [null, null, null];
+    // ---------- 以下为完整脚本（基于 V2 稳定版，融合升级） ----------
+    let appData = null;
+    let currentCategoryWorks = [];
+    let carouselIndex = 0;
+    let categories = [];
+    let carouselCardNodes = [null, null, null];
 
-        // 工具函数：将相对路径（以 images/ 开头）替换为 CDN 绝对路径
-        function toCdnUrl(relativePath) {
-            if (!relativePath) return '';
-            // 如果已经是绝对 URL（http 开头），直接返回
-            if (/^https?:\/\//i.test(relativePath)) return relativePath;
-            // 否则拼接 CDN 基础地址
-            return IMAGE_BASE_URL + relativePath;
+    // 工具：将相对路径转为 CDN 绝对路径
+    function toCdnUrl(relativePath) {
+        if (!relativePath) return '';
+        if (/^https?:\/\//i.test(relativePath)) return relativePath;
+        return IMAGE_BASE_URL + relativePath;
+    }
+
+    // 递归遍历对象，替换所有图片字段（src, cover, storyImage, images 数组）
+    function replaceImageUrls(obj) {
+        if (!obj || typeof obj !== 'object') return obj;
+        if (Array.isArray(obj)) {
+            return obj.map(item => replaceImageUrls(item));
         }
-
-        // 递归遍历对象，将所有图片字段（src, images, cover, storyImage）替换为 CDN URL
-        function replaceImageUrls(obj) {
-            if (!obj || typeof obj !== 'object') return obj;
-            if (Array.isArray(obj)) {
-                return obj.map(item => replaceImageUrls(item));
-            }
-            const newObj = { ...obj };
-            for (let key in newObj) {
-                if (key === 'src' || key === 'cover' || key === 'storyImage') {
-                    if (typeof newObj[key] === 'string') {
-                        newObj[key] = toCdnUrl(newObj[key]);
-                    }
-                } else if (key === 'images' && Array.isArray(newObj[key])) {
-                    newObj[key] = newObj[key].map(url => toCdnUrl(url));
-                } else if (typeof newObj[key] === 'object' && newObj[key] !== null) {
-                    newObj[key] = replaceImageUrls(newObj[key]);
+        const newObj = { ...obj };
+        for (let key in newObj) {
+            if (key === 'src' || key === 'cover' || key === 'storyImage') {
+                if (typeof newObj[key] === 'string') {
+                    newObj[key] = toCdnUrl(newObj[key]);
                 }
+            } else if (key === 'images' && Array.isArray(newObj[key])) {
+                newObj[key] = newObj[key].map(url => toCdnUrl(url));
+            } else if (typeof newObj[key] === 'object' && newObj[key] !== null) {
+                newObj[key] = replaceImageUrls(newObj[key]);
             }
-            return newObj;
         }
+        return newObj;
+    }
 
-        // 其他辅助函数（escapeHtml, setImageWithFallback 等）保持不变
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>"']/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                if (m === '"') return '&quot;';
-                if (m === "'") return '&#39;';
-                return m;
-            });
-        }
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>"']/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            if (m === '"') return '&quot;';
+            if (m === "'") return '&#39;';
+            return m;
+        });
+    }
 
-        function setImageWithFallback(imgElement, originalUrl) {
-            if (!imgElement || !originalUrl) {
-                if (imgElement) {
-                    imgElement.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-                    imgElement.style.backgroundColor = '#2a1a3a';
-                    imgElement.onerror = null;
-                }
-                return;
+    function setImageWithFallback(imgElement, originalUrl) {
+        if (!imgElement || !originalUrl) {
+            if (imgElement) {
+                imgElement.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+                imgElement.style.backgroundColor = '#2a1a3a';
+                imgElement.onerror = null;
             }
-            // 如果传入的是相对路径，先转为 CDN URL
-            const cdnUrl = toCdnUrl(originalUrl);
-            const lowerUrl = cdnUrl.toLowerCase();
-            if (lowerUrl.endsWith('.webp')) {
-                const fallbackJpg = cdnUrl.slice(0, -5) + '.jpg';
-                const fallbackPng = cdnUrl.slice(0, -5) + '.png';
-                imgElement.src = cdnUrl;
-                imgElement.onerror = function() {
-                    if (this.src === cdnUrl) {
-                        this.src = fallbackJpg;
-                    } else if (this.src === fallbackJpg) {
-                        this.src = fallbackPng;
-                    } else {
-                        this.onerror = null;
-                        this.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-                        this.style.backgroundColor = '#2a1a3a';
-                    }
-                };
-            } else {
-                imgElement.src = cdnUrl;
-                imgElement.onerror = function() {
+            return;
+        }
+        const cdnUrl = toCdnUrl(originalUrl);
+        const lowerUrl = cdnUrl.toLowerCase();
+        if (lowerUrl.endsWith('.webp')) {
+            const fallbackJpg = cdnUrl.slice(0, -5) + '.jpg';
+            const fallbackPng = cdnUrl.slice(0, -5) + '.png';
+            imgElement.src = cdnUrl;
+            imgElement.onerror = function() {
+                if (this.src === cdnUrl) {
+                    this.src = fallbackJpg;
+                } else if (this.src === fallbackJpg) {
+                    this.src = fallbackPng;
+                } else {
                     this.onerror = null;
                     this.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
                     this.style.backgroundColor = '#2a1a3a';
+                }
+            };
+        } else {
+            imgElement.src = cdnUrl;
+            imgElement.onerror = function() {
+                this.onerror = null;
+                this.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+                this.style.backgroundColor = '#2a1a3a';
+            };
+        }
+    }
+
+    function formatDescription(desc) {
+        if (!desc) return '';
+        let protected = desc.replace(/<br\s*\/?>/gi, '{{BR}}');
+        let withBreaks = protected.replace(/\n/g, '<br>');
+        return withBreaks.replace(/\{\{BR\}\}/g, '<br>');
+    }
+
+    // ---------- 数据加载 ----------
+    async function loadData() {
+        updateLoadingBar(10);
+        try {
+            const res = await fetch('data.json?_=' + Date.now());
+            let rawData = await res.json();
+            appData = replaceImageUrls(rawData); // 替换所有图片路径
+            updateLoadingBar(40);
+            await preloadCriticalImages(appData);
+            updateLoadingBar(100);
+            setTimeout(() => {
+                document.getElementById('loadingBar').style.width = '100%';
+                setTimeout(() => document.getElementById('loadingBar').style.opacity = '0', 500);
+            }, 200);
+            initFullSite();
+        } catch(e) {
+            console.warn('加载 data.json 失败，使用占位数据');
+            appData = replaceImageUrls(getPlaceholderData());
+            initFullSite();
+        }
+    }
+
+    function updateLoadingBar(percent) {
+        const bar = document.getElementById('loadingBar');
+        bar.style.width = Math.min(percent, 100) + '%';
+    }
+
+    async function preloadCriticalImages(data) {
+        const urls = [];
+        if(data.storyImage) urls.push(data.storyImage);
+        data.categories.forEach(cat => {
+            if(cat.cover) urls.push(cat.cover);
+            if(cat.works[0] && cat.works[0].src) urls.push(cat.works[0].src);
+            else if(cat.works[0] && cat.works[0].images && cat.works[0].images[0]) urls.push(cat.works[0].images[0]);
+        });
+        let loaded = 0;
+        for(let url of urls) {
+            await new Promise(resolve => {
+                const img = new Image();
+                img.onload = img.onerror = () => {
+                    loaded++;
+                    updateLoadingBar(40 + (loaded/urls.length)*60);
+                    resolve();
                 };
-            }
-        }
-
-        function formatDescription(desc) {
-            if (!desc) return '';
-            let protected = desc.replace(/<br\s*\/?>/gi, '{{BR}}');
-            let withBreaks = protected.replace(/\n/g, '<br>');
-            return withBreaks.replace(/\{\{BR\}\}/g, '<br>');
-        }
-
-        // ---------- 加载数据（包含路径替换） ----------
-        async function loadData() {
-            updateLoadingBar(10);
-            try {
-                const res = await fetch('data.json?_=' + Date.now());
-                let rawData = await res.json();
-                // 替换所有图片路径为 CDN URL
-                appData = replaceImageUrls(rawData);
-                updateLoadingBar(40);
-                await preloadCriticalImages(appData);
-                updateLoadingBar(100);
-                setTimeout(() => {
-                    document.getElementById('loadingBar').style.width = '100%';
-                    setTimeout(() => document.getElementById('loadingBar').style.opacity = '0', 500);
-                }, 200);
-                initFullSite();
-            } catch(e) {
-                console.warn('加载 data.json 失败，使用占位数据');
-                appData = getPlaceholderData();
-                // 同样替换占位数据中的路径
-                appData = replaceImageUrls(appData);
-                initFullSite();
-            }
-        }
-
-        function updateLoadingBar(percent) {
-            const bar = document.getElementById('loadingBar');
-            bar.style.width = Math.min(percent, 100) + '%';
-        }
-
-        async function preloadCriticalImages(data) {
-            const urls = [];
-            if(data.storyImage) urls.push(data.storyImage);
-            data.categories.forEach(cat => {
-                if(cat.cover) urls.push(cat.cover);
-                if(cat.works[0] && cat.works[0].src) urls.push(cat.works[0].src);
-                else if(cat.works[0] && cat.works[0].images && cat.works[0].images[0]) urls.push(cat.works[0].images[0]);
+                img.src = url;
             });
-            let loaded = 0;
-            for(let url of urls) {
-                await new Promise(resolve => {
-                    const img = new Image();
-                    img.onload = img.onerror = () => {
-                        loaded++;
-                        updateLoadingBar(40 + (loaded/urls.length)*60);
-                        resolve();
-                    };
-                    img.src = url;  // 已经是 CDN URL
+        }
+    }
+
+    function getPlaceholderData() {
+        return {
+            studioName: "FTN STUDIO",
+            slogan: "致力于向世界展示不务正业的热爱",
+            story: "<p>花汐夜（Flower·Tidal·Night）...</p>",
+            storyImage: "images/story.webp",
+            categories: []
+        };
+    }
+
+    // ---------- 粒子特效（升级：背景 80） ----------
+    function initParticles() {
+        particlesJS("particles-js", {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#fa67b2" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: { enable: true, distance: 150, color: "#9d4edd", opacity: 0.3, width: 1 },
+                move: { enable: true, speed: 2, direction: "none", random: true }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+    }
+
+    // ---------- 轮播 ----------
+    function initCarouselNodes() {
+        const track = document.getElementById('carouselTrack');
+        if (!track) return;
+        if (carouselCardNodes[0] === null) {
+            for (let i = 0; i < 3; i++) {
+                const card = document.createElement('div');
+                card.className = 'category-carousel-card';
+                card.innerHTML = `<img src="" alt="" loading="lazy"><div class="card-title"></div>`;
+                track.appendChild(card);
+                carouselCardNodes[i] = card;
+            }
+        }
+    }
+
+    function updateCarouselCards() {
+        const total = categories.length;
+        const prevIndex = (carouselIndex - 1 + total) % total;
+        const nextIndex = (carouselIndex + 1) % total;
+        const catsToShow = [
+            { cat: categories[prevIndex], position: 'left' },
+            { cat: categories[carouselIndex], position: 'center' },
+            { cat: categories[nextIndex], position: 'right' }
+        ];
+        catsToShow.forEach((item, idx) => {
+            const card = carouselCardNodes[idx];
+            if (!card) return;
+            card.className = `category-carousel-card ${item.position}`;
+            const img = card.querySelector('img');
+            setImageWithFallback(img, item.cat.cover);
+            const titleDiv = card.querySelector('.card-title');
+            titleDiv.textContent = item.cat.title;
+            if (item.position === 'center') card.onclick = () => openCategoryWorks(item.cat.id);
+            else card.onclick = null;
+        });
+    }
+
+    function renderCarouselWithTransition() {
+        const track = document.getElementById('carouselTrack');
+        if (!track) return;
+        gsap.to(track, { opacity: 0, duration: 0.2, onComplete: () => {
+            updateCarouselCards();
+            gsap.to(track, { opacity: 1, duration: 0.3 });
+        }});
+    }
+
+    function nextCategory() { carouselIndex = (carouselIndex + 1) % categories.length; renderCarouselWithTransition(); }
+    function prevCategory() { carouselIndex = (carouselIndex - 1 + categories.length) % categories.length; renderCarouselWithTransition(); }
+    function renderCarousel() { initCarouselNodes(); updateCarouselCards(); const t = document.getElementById('carouselTrack'); if (t) t.style.opacity = 1; }
+
+    // ---------- 打开分类（含卡片 stagger 入场） ----------
+    function openCategoryWorks(catId) {
+        const category = categories.find(c => c.id === catId);
+        if (!category) return;
+        currentCategoryWorks = category.works;
+        const overlay = document.getElementById('worksOverlay');
+        const grid = document.getElementById('worksGrid');
+
+        gsap.killTweensOf(grid.querySelectorAll('.work-card'));
+        grid.innerHTML = '';
+
+        const fragment = document.createDocumentFragment();
+        category.works.forEach((work, idx) => {
+            const card = document.createElement('div');
+            card.className = 'work-card';
+            let imgUrl = work.src;
+            if (!imgUrl && work.images && work.images.length > 0) {
+                imgUrl = work.images[0];
+            }
+            const img = document.createElement('img');
+            setImageWithFallback(img, imgUrl || '');
+            img.alt = work.title || '作品';
+            img.loading = 'lazy';
+            img.decoding = 'async';
+            let displayTitle = work.title;
+            if (!displayTitle || displayTitle.trim() === '') {
+                console.warn(`分类 ${catId} 中作品 ${idx+1} 缺少 title`, work);
+                displayTitle = '(无标题)';
+            }
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'work-title';
+            titleDiv.textContent = displayTitle;
+            card.appendChild(img);
+            card.appendChild(titleDiv);
+            card.addEventListener('click', () => openWorkDetail(idx));
+            fragment.appendChild(card);
+        });
+        grid.appendChild(fragment);
+        overlay.classList.add('active');
+
+        // ---- 卡片分批入场动画 (stagger 0.06s) ----
+        const cards = grid.querySelectorAll('.work-card');
+        gsap.set(cards, { opacity: 0, y: 24 });
+        gsap.to(cards, {
+            opacity: 1,
+            y: 0,
+            stagger: 0.06,
+            duration: 0.55,
+            ease: 'power2.out',
+            overwrite: 'auto'
+        });
+    }
+
+    // ---------- 作品详情 ----------
+    let currentDetailImages = [];
+    let currentDetailImageIndex = 0;
+    let detailActive = false;
+
+    function openWorkDetail(index) {
+        const work = currentCategoryWorks[index];
+        if (!work) return;
+        const images = work.images && work.images.length ? work.images : [work.src];
+        currentDetailImages = images;
+        currentDetailImageIndex = 0;
+
+        const container = document.getElementById('detailContainer');
+        const renderDetail = () => {
+            const linkButton = work.link ? `<a href="${work.link}" target="_blank" class="work-detail-link">试听 <i class="fas fa-external-link-alt"></i></a>` : '';
+            const hasMultiple = images.length > 1;
+            const arrows = hasMultiple ? `<div class="carousel-arrow-detail left" id="carouselPrev">‹</div><div class="carousel-arrow-detail right" id="carouselNext">›</div><div class="carousel-indicators" id="carouselIndicators"></div>` : '';
+            container.innerHTML = `
+                <div class="detail-image">
+                    <img class="carousel-img" id="carouselMainImg" src="${escapeHtml(images[0])}" alt="${escapeHtml(work.title)}" loading="lazy" decoding="async">
+                    ${arrows}
+                </div>
+                <div class="detail-info">
+                    <h2>${escapeHtml(work.title)}</h2>
+                    <p>${formatDescription(work.description)}</p>
+                    ${linkButton}
+                </div>
+            `;
+            if (hasMultiple) {
+                const indicatorsContainer = document.getElementById('carouselIndicators');
+                for (let i = 0; i < images.length; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = `carousel-dot ${i === currentDetailImageIndex ? 'active' : ''}`;
+                    dot.addEventListener('click', () => {
+                        currentDetailImageIndex = i;
+                        updateDetailImage();
+                    });
+                    indicatorsContainer.appendChild(dot);
+                }
+                const prevBtn = document.getElementById('carouselPrev');
+                const nextBtn = document.getElementById('carouselNext');
+                if (prevBtn) prevBtn.addEventListener('click', () => {
+                    currentDetailImageIndex = (currentDetailImageIndex - 1 + images.length) % images.length;
+                    updateDetailImage();
+                });
+                if (nextBtn) nextBtn.addEventListener('click', () => {
+                    currentDetailImageIndex = (currentDetailImageIndex + 1) % images.length;
+                    updateDetailImage();
                 });
             }
-        }
+        };
 
-        function getPlaceholderData() {
-            return {
-                studioName: "FTN STUDIO",
-                slogan: "致力于向世界展示不务正业的热爱",
-                story: "<p>花汐夜（Flower·Tidal·Night）...</p>",
-                storyImage: "images/story.webp",
-                categories: []
-            };
-        }
-
-        // ---------- 粒子特效（升级版：背景 80） ----------
-        function initParticles() {
-            particlesJS("particles-js", {
-                particles: {
-                    number: { value: 80, density: { enable: true, value_area: 800 } },
-                    color: { value: "#fa67b2" },
-                    shape: { type: "circle" },
-                    opacity: { value: 0.5, random: true },
-                    size: { value: 3, random: true },
-                    line_linked: { enable: true, distance: 150, color: "#9d4edd", opacity: 0.3, width: 1 },
-                    move: { enable: true, speed: 2, direction: "none", random: true }
-                },
-                interactivity: {
-                    detect_on: "canvas",
-                    events: {
-                        onhover: { enable: true, mode: "repulse" },
-                        onclick: { enable: true, mode: "push" }
-                    }
-                }
-            });
-        }
-
-        // ---------- 轮播 ----------
-        function initCarouselNodes() {
-            const track = document.getElementById('carouselTrack');
-            if (!track) return;
-            if (carouselCardNodes[0] === null) {
-                for (let i = 0; i < 3; i++) {
-                    const card = document.createElement('div');
-                    card.className = 'category-carousel-card';
-                    card.innerHTML = `<img src="" alt="" loading="lazy"><div class="card-title"></div>`;
-                    track.appendChild(card);
-                    carouselCardNodes[i] = card;
-                }
-            }
-        }
-
-        function updateCarouselCards() {
-            const total = categories.length;
-            const prevIndex = (carouselIndex - 1 + total) % total;
-            const nextIndex = (carouselIndex + 1) % total;
-            const catsToShow = [
-                { cat: categories[prevIndex], position: 'left' },
-                { cat: categories[carouselIndex], position: 'center' },
-                { cat: categories[nextIndex], position: 'right' }
-            ];
-            catsToShow.forEach((item, idx) => {
-                const card = carouselCardNodes[idx];
-                if (!card) return;
-                card.className = `category-carousel-card ${item.position}`;
-                const img = card.querySelector('img');
-                setImageWithFallback(img, item.cat.cover);
-                const titleDiv = card.querySelector('.card-title');
-                titleDiv.textContent = item.cat.title;
-                if (item.position === 'center') card.onclick = () => openCategoryWorks(item.cat.id);
-                else card.onclick = null;
-            });
-        }
-
-        function renderCarouselWithTransition() {
-            const track = document.getElementById('carouselTrack');
-            if (!track) return;
-            gsap.to(track, { opacity: 0, duration: 0.2, onComplete: () => {
-                updateCarouselCards();
-                gsap.to(track, { opacity: 1, duration: 0.3 });
+        const updateDetailImage = () => {
+            const imgEl = document.getElementById('carouselMainImg');
+            if (!imgEl) return;
+            gsap.to(imgEl, { opacity: 0, duration: 0.15, onComplete: () => {
+                setImageWithFallback(imgEl, currentDetailImages[currentDetailImageIndex]);
+                imgEl.onload = () => gsap.to(imgEl, { opacity: 1, duration: 0.2 });
+                const dots = document.querySelectorAll('.carousel-dot');
+                dots.forEach((dot, idx) => dot.classList.toggle('active', idx === currentDetailImageIndex));
             }});
-        }
+        };
 
-        function nextCategory() { carouselIndex = (carouselIndex + 1) % categories.length; renderCarouselWithTransition(); }
-        function prevCategory() { carouselIndex = (carouselIndex - 1 + categories.length) % categories.length; renderCarouselWithTransition(); }
-        function renderCarousel() { initCarouselNodes(); updateCarouselCards(); const t = document.getElementById('carouselTrack'); if (t) t.style.opacity = 1; }
+        renderDetail();
+        const overlay = document.getElementById('detailOverlay');
+        overlay.classList.add('active');
+        detailActive = true;
 
-        // ---------- 打开分类（含卡片 stagger 入场） ----------
-        function openCategoryWorks(catId) {
-            const category = categories.find(c => c.id === catId);
-            if (!category) return;
-            currentCategoryWorks = category.works;
-            const overlay = document.getElementById('worksOverlay');
-            const grid = document.getElementById('worksGrid');
-
-            gsap.killTweensOf(grid.querySelectorAll('.work-card'));
-            grid.innerHTML = '';
-
-            const fragment = document.createDocumentFragment();
-            category.works.forEach((work, idx) => {
-                const card = document.createElement('div');
-                card.className = 'work-card';
-                let imgUrl = work.src;
-                if (!imgUrl && work.images && work.images.length > 0) {
-                    imgUrl = work.images[0];
+        const keyHandler = (e) => {
+            if (!detailActive) return;
+            if (e.key === 'Escape') {
+                closeDetailOverlay();
+            } else if (e.key === 'ArrowLeft') {
+                if (currentDetailImages.length > 1) {
+                    currentDetailImageIndex = (currentDetailImageIndex - 1 + currentDetailImages.length) % currentDetailImages.length;
+                    updateDetailImage();
                 }
-                const img = document.createElement('img');
-                setImageWithFallback(img, imgUrl || '');
-                img.alt = work.title || '作品';
-                img.loading = 'lazy';
-                img.decoding = 'async';
-                let displayTitle = work.title;
-                if (!displayTitle || displayTitle.trim() === '') {
-                    console.warn(`分类 ${catId} 中作品 ${idx+1} 缺少 title`, work);
-                    displayTitle = '(无标题)';
+            } else if (e.key === 'ArrowRight') {
+                if (currentDetailImages.length > 1) {
+                    currentDetailImageIndex = (currentDetailImageIndex + 1) % currentDetailImages.length;
+                    updateDetailImage();
                 }
-                const titleDiv = document.createElement('div');
-                titleDiv.className = 'work-title';
-                titleDiv.textContent = displayTitle;
-                card.appendChild(img);
-                card.appendChild(titleDiv);
-                card.addEventListener('click', () => openWorkDetail(idx));
-                fragment.appendChild(card);
-            });
-            grid.appendChild(fragment);
-            overlay.classList.add('active');
-
-            const cards = grid.querySelectorAll('.work-card');
-            gsap.set(cards, { opacity: 0, y: 24 });
-            gsap.to(cards, {
-                opacity: 1,
-                y: 0,
-                stagger: 0.06,
-                duration: 0.55,
-                ease: 'power2.out',
-                overwrite: 'auto'
-            });
-        }
-
-        // ---------- 作品详情 ----------
-        let currentDetailImages = [];
-        let currentDetailImageIndex = 0;
-        let detailActive = false;
-
-        function openWorkDetail(index) {
-            const work = currentCategoryWorks[index];
-            if (!work) return;
-            const images = work.images && work.images.length ? work.images : [work.src];
-            currentDetailImages = images;
-            currentDetailImageIndex = 0;
-
-            const container = document.getElementById('detailContainer');
-            const renderDetail = () => {
-                const linkButton = work.link ? `<a href="${work.link}" target="_blank" class="work-detail-link">试听 <i class="fas fa-external-link-alt"></i></a>` : '';
-                const hasMultiple = images.length > 1;
-                const arrows = hasMultiple ? `<div class="carousel-arrow-detail left" id="carouselPrev">‹</div><div class="carousel-arrow-detail right" id="carouselNext">›</div><div class="carousel-indicators" id="carouselIndicators"></div>` : '';
-                container.innerHTML = `
-                    <div class="detail-image">
-                        <img class="carousel-img" id="carouselMainImg" src="${escapeHtml(images[0])}" alt="${escapeHtml(work.title)}" loading="lazy" decoding="async">
-                        ${arrows}
-                    </div>
-                    <div class="detail-info">
-                        <h2>${escapeHtml(work.title)}</h2>
-                        <p>${formatDescription(work.description)}</p>
-                        ${linkButton}
-                    </div>
-                `;
-                if (hasMultiple) {
-                    const indicatorsContainer = document.getElementById('carouselIndicators');
-                    for (let i = 0; i < images.length; i++) {
-                        const dot = document.createElement('div');
-                        dot.className = `carousel-dot ${i === currentDetailImageIndex ? 'active' : ''}`;
-                        dot.addEventListener('click', () => {
-                            currentDetailImageIndex = i;
-                            updateDetailImage();
-                        });
-                        indicatorsContainer.appendChild(dot);
-                    }
-                    const prevBtn = document.getElementById('carouselPrev');
-                    const nextBtn = document.getElementById('carouselNext');
-                    if (prevBtn) prevBtn.addEventListener('click', () => {
-                        currentDetailImageIndex = (currentDetailImageIndex - 1 + images.length) % images.length;
-                        updateDetailImage();
-                    });
-                    if (nextBtn) nextBtn.addEventListener('click', () => {
-                        currentDetailImageIndex = (currentDetailImageIndex + 1) % images.length;
-                        updateDetailImage();
-                    });
-                }
-            };
-
-            const updateDetailImage = () => {
-                const imgEl = document.getElementById('carouselMainImg');
-                if (!imgEl) return;
-                gsap.to(imgEl, { opacity: 0, duration: 0.15, onComplete: () => {
-                    setImageWithFallback(imgEl, currentDetailImages[currentDetailImageIndex]);
-                    imgEl.onload = () => gsap.to(imgEl, { opacity: 1, duration: 0.2 });
-                    const dots = document.querySelectorAll('.carousel-dot');
-                    dots.forEach((dot, idx) => dot.classList.toggle('active', idx === currentDetailImageIndex));
-                }});
-            };
-
-            renderDetail();
-            const overlay = document.getElementById('detailOverlay');
-            overlay.classList.add('active');
-            detailActive = true;
-
-            const keyHandler = (e) => {
-                if (!detailActive) return;
-                if (e.key === 'Escape') {
-                    closeDetailOverlay();
-                } else if (e.key === 'ArrowLeft') {
-                    if (currentDetailImages.length > 1) {
-                        currentDetailImageIndex = (currentDetailImageIndex - 1 + currentDetailImages.length) % currentDetailImages.length;
-                        updateDetailImage();
-                    }
-                } else if (e.key === 'ArrowRight') {
-                    if (currentDetailImages.length > 1) {
-                        currentDetailImageIndex = (currentDetailImageIndex + 1) % currentDetailImages.length;
-                        updateDetailImage();
-                    }
-                }
-            };
-            window.addEventListener('keydown', keyHandler);
-            overlay._keyHandler = keyHandler;
-
-            const closeDetailHandler = (e) => {
-                if (e.target === overlay) {
-                    closeDetailOverlay();
-                }
-            };
-            overlay.addEventListener('click', closeDetailHandler);
-            overlay._closeHandler = closeDetailHandler;
-        }
-
-        function closeDetailOverlay() {
-            const overlay = document.getElementById('detailOverlay');
-            overlay.classList.remove('active');
-            detailActive = false;
-            if (overlay._keyHandler) {
-                window.removeEventListener('keydown', overlay._keyHandler);
-                delete overlay._keyHandler;
             }
-            if (overlay._closeHandler) {
-                overlay.removeEventListener('click', overlay._closeHandler);
-                delete overlay._closeHandler;
+        };
+        window.addEventListener('keydown', keyHandler);
+        overlay._keyHandler = keyHandler;
+
+        const closeDetailHandler = (e) => {
+            if (e.target === overlay) {
+                closeDetailOverlay();
             }
+        };
+        overlay.addEventListener('click', closeDetailHandler);
+        overlay._closeHandler = closeDetailHandler;
+    }
+
+    function closeDetailOverlay() {
+        const overlay = document.getElementById('detailOverlay');
+        overlay.classList.remove('active');
+        detailActive = false;
+        if (overlay._keyHandler) {
+            window.removeEventListener('keydown', overlay._keyHandler);
+            delete overlay._keyHandler;
         }
-        document.getElementById('closeDetail').addEventListener('click', closeDetailOverlay);
-
-        // ---------- 主初始化 ----------
-        function initFullSite() {
-            initParticles();
-            document.getElementById('storyTextArea').innerHTML = appData.story;
-            document.getElementById('mainName').innerText = appData.studioName;
-            document.getElementById('sloganText').innerText = appData.slogan;
-            categories = appData.categories;
-            carouselIndex = 0;
-            renderCarousel();
-            document.getElementById('carouselLeft').addEventListener('click', prevCategory);
-            document.getElementById('carouselRight').addEventListener('click', nextCategory);
-
-            const logo = document.getElementById('mainLogo');
-            // 设置 Logo 的 CDN 路径
-            setImageWithFallback(logo, 'images/FTN-logo.webp');
-
-            const nameSpan = document.getElementById('mainName');
-            const brandWrapper = document.getElementById('brandWrapper');
-            gsap.set(logo, { opacity: 0, scale: 0.95 });
-            gsap.set(nameSpan, { opacity: 0, x: 10 });
-            gsap.set(brandWrapper, { x: 0 });
-            const tl = gsap.timeline();
-            tl.to(logo, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out", delay: 0.3 })
-              .to(logo, { scale: 1.02, duration: 0.8, repeat: 1, yoyo: true, ease: "power1.inOut", onComplete: () => gsap.set(logo, { scale: 1 }) }, "-=0.8")
-              .to(brandWrapper, { 
-                  x: window.innerWidth <= 800 ? -107 : -180, 
-                  duration: 1.2, 
-                  ease: "power3.out" 
-              }, "+=1")
-              .to(nameSpan, { opacity: 1, x: 0, duration: 1.2, ease: "power3.out" }, "<")
-              .to('#sloganText', { opacity: 1, y: 0, boxShadow: "0 0 18px rgba(200,100,255,0.5)", duration: 0.6, ease: "power2.out" }, "+=0.4")
-              .to('#scrollHint', { width: '80%', duration: 1, ease: "power1.inOut" }, "-=0.4")
-              .call(() => { if (window.scrollY < 200) startBreathingGlow(); });
-
-            let glowAnimation = null, isGlowing = true;
-            function startBreathingGlow() {
-                if (glowAnimation) glowAnimation.kill();
-                glowAnimation = gsap.to(logo, { duration: 1.8, filter: "drop-shadow(0 0 12px #c084fc) drop-shadow(0 0 18px #f0a6ff)", repeat: -1, yoyo: true, ease: "power1.inOut", paused: true });
-                if (window.scrollY < 200 && isGlowing) glowAnimation.play();
-            }
-            function stopBreathingGlow() { isGlowing = false; if (glowAnimation) { glowAnimation.kill(); glowAnimation = null; } gsap.set(logo, { filter: "none" }); }
-            function resumeBreathingGlow() { if (window.scrollY >= 200) return; if (!isGlowing) { isGlowing = true; startBreathingGlow(); } else if (glowAnimation && glowAnimation.paused()) glowAnimation.play(); }
-            window.addEventListener('scroll', () => { if (window.scrollY < 200) resumeBreathingGlow(); else stopBreathingGlow(); });
-
-            // Logo 消散粒子（升级版）
-            const heroSection = document.getElementById('hero');
-            const slogan = document.getElementById('sloganText');
-            const fxCanvas = document.getElementById('fx-canvas');
-            let ctx = fxCanvas.getContext('2d');
-            let currentParticles = [];
-            let dissolveAnimationFrame = null;
-            function resizeFxCanvas() { fxCanvas.width = window.innerWidth; fxCanvas.height = window.innerHeight; }
-            window.addEventListener('resize', resizeFxCanvas);
-            resizeFxCanvas();
-            class Particle { constructor(x,y,c,s,vx,vy) { this.x=x; this.y=y; this.originX=x; this.originY=y; this.color=c; this.size=s; this.vx=vx; this.vy=vy; this.alpha=1; } update(p) { const e=1-Math.pow(1-p,3); this.x=this.originX+this.vx*180*e; this.y=this.originY+this.vy*180*e; this.alpha=1-e; } draw(ctx) { ctx.save(); ctx.globalAlpha=this.alpha; ctx.fillStyle=this.color; ctx.shadowBlur=6; ctx.shadowColor='#c084fc'; ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill(); ctx.restore(); } }
-            function generateParticlesFromElement(el, n=80) { if(!el) return []; const r=el.getBoundingClientRect(); if(r.width===0||r.height===0) return []; const c=document.createElement('canvas'); c.width=r.width; c.height=r.height; const ct=c.getContext('2d'); let cols=[]; if(el.tagName==='IMG'&&el.complete&&el.naturalWidth>0){ ct.drawImage(el,0,0,r.width,r.height); const d=ct.getImageData(0,0,r.width,r.height).data; for(let i=0;i<n;i++){ const px=Math.floor(Math.random()*r.width), py=Math.floor(Math.random()*r.height), idx=(py*r.width+px)*4; cols.push(`rgb(${d[idx]},${d[idx+1]},${d[idx+2]})`); } } else { const bc=['#e0b0ff','#c084fc','#a855f7','#d946ef','#f0a6ff']; for(let i=0;i<n;i++) cols.push(bc[Math.floor(Math.random()*bc.length)]); } const p=[]; for(let i=0;i<n;i++){ const x=r.left+Math.random()*r.width, y=r.top+Math.random()*r.height, a=Math.random()*Math.PI*2, sp=0.4+Math.random()*0.8, vx=Math.cos(a)*sp, vy=Math.sin(a)*sp, col=cols[i%cols.length], sz=2+Math.random()*5; p.push(new Particle(x,y,col,sz,vx,vy)); } return p; }
-            function updateDissolveProgress(prog) { if(!currentParticles.length && prog>0.05){ const lp=generateParticlesFromElement(logo,140); const np=generateParticlesFromElement(nameSpan,90); const sp=generateParticlesFromElement(slogan,70); currentParticles=[...lp,...np,...sp]; stopBreathingGlow(); } if(currentParticles.length){ for(let p of currentParticles) p.update(prog); const show=prog<0.05; gsap.set([logo,nameSpan,slogan],{opacity:show?1:0,visibility:show?'visible':'hidden'}); if(prog>=0.98){ if(dissolveAnimationFrame) cancelAnimationFrame(dissolveAnimationFrame); dissolveAnimationFrame=null; }else{ startParticleRender(); } } }
-            function startParticleRender(){ if(dissolveAnimationFrame) cancelAnimationFrame(dissolveAnimationFrame); function render(){ if(!ctx) return; ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height); for(let p of currentParticles) p.draw(ctx); dissolveAnimationFrame=requestAnimationFrame(render); } render(); }
-            ScrollTrigger.create({ trigger: heroSection, start:"top top", end:"+=550", scrub:1.2, onUpdate:self=>{ const prog=Math.min(1,Math.max(0,self.progress)); updateDissolveProgress(prog); }, onLeaveBack:()=>{ if(dissolveAnimationFrame) cancelAnimationFrame(dissolveAnimationFrame); dissolveAnimationFrame=null; if(ctx) ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height); currentParticles=[]; gsap.set([logo,nameSpan,slogan],{opacity:1,visibility:'visible'}); if(window.scrollY<200) resumeBreathingGlow(); } });
-
-            // 故事 & 轮播淡入
-            const storySection = document.getElementById('storySection');
-            ScrollTrigger.create({ trigger: storySection, start:"top 80%", end:"top 20%", scrub:0.8, onUpdate:self=>{ const p=Math.min(1,Math.max(0,self.progress)); const ep=1-Math.pow(1-p,2); storySection.style.opacity=ep; storySection.style.transform=`translateY(${30*(1-ep)}px)`; } });
-            const storyParas = document.querySelectorAll('#storyTextArea p');
-            if(storyParas.length) gsap.fromTo(storyParas, {opacity:0,y:20}, {opacity:1,y:0, stagger:0.2, duration:1, scrollTrigger:{ trigger:'#storySection', start:'top 80%', end:'bottom 70%', scrub:0.5 }});
-            const carouselSection = document.getElementById('carouselSection');
-            ScrollTrigger.create({ trigger: carouselSection, start:"top 80%", end:"top 20%", scrub:0.8, onUpdate:self=>{ const p=Math.min(1,Math.max(0,self.progress)); const ep=1-Math.pow(1-p,2); carouselSection.style.opacity=ep; carouselSection.style.transform=`translateY(${30*(1-ep)}px)`; } });
-            document.getElementById('closeOverlay').addEventListener('click',()=>document.getElementById('worksOverlay').classList.remove('active'));
-
-            // 光标
-            const glowCursor = document.getElementById('cursorGlow');
-            document.addEventListener('mousemove',e=>gsap.set(glowCursor,{left:e.clientX,top:e.clientY}));
-            document.querySelectorAll('a, button, .category-carousel-card, .work-card, .close-overlay, .close-detail, .carousel-arrow').forEach(el=>{
-                el.addEventListener('mouseenter',()=>gsap.to(glowCursor,{width:100,height:100,duration:0.2}));
-                el.addEventListener('mouseleave',()=>gsap.to(glowCursor,{width:60,height:60,duration:0.2}));
-            });
+        if (overlay._closeHandler) {
+            overlay.removeEventListener('click', overlay._closeHandler);
+            delete overlay._closeHandler;
         }
+    }
+    document.getElementById('closeDetail').addEventListener('click', closeDetailOverlay);
 
-        loadData();
-    </script>
+    // ---------- 主初始化 ----------
+    function initFullSite() {
+        initParticles();
+        document.getElementById('storyTextArea').innerHTML = appData.story;
+        document.getElementById('mainName').innerText = appData.studioName;
+        document.getElementById('sloganText').innerText = appData.slogan;
+        categories = appData.categories;
+        carouselIndex = 0;
+        renderCarousel();
+        document.getElementById('carouselLeft').addEventListener('click', prevCategory);
+        document.getElementById('carouselRight').addEventListener('click', nextCategory);
+
+        const logo = document.getElementById('mainLogo');
+        // 设置 Logo 的 CDN 路径
+        setImageWithFallback(logo, 'images/FTN-logo.webp');
+
+        const nameSpan = document.getElementById('mainName');
+        const brandWrapper = document.getElementById('brandWrapper');
+        gsap.set(logo, { opacity: 0, scale: 0.95 });
+        gsap.set(nameSpan, { opacity: 0, x: 10 });
+        gsap.set(brandWrapper, { x: 0 });
+        const tl = gsap.timeline();
+        tl.to(logo, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out", delay: 0.3 })
+          .to(logo, { scale: 1.02, duration: 0.8, repeat: 1, yoyo: true, ease: "power1.inOut", onComplete: () => gsap.set(logo, { scale: 1 }) }, "-=0.8")
+          .to(brandWrapper, {
+              x: window.innerWidth <= 800 ? -107 : -180,  // V2 响应式位移
+              duration: 1.2,
+              ease: "power3.out"
+          }, "+=1")
+          .to(nameSpan, { opacity: 1, x: 0, duration: 1.2, ease: "power3.out" }, "<")
+          .to('#sloganText', { opacity: 1, y: 0, boxShadow: "0 0 18px rgba(200,100,255,0.5)", duration: 0.6, ease: "power2.out" }, "+=0.4")
+          .to('#scrollHint', { width: '80%', duration: 1, ease: "power1.inOut" }, "-=0.4")
+          .call(() => { if (window.scrollY < 200) startBreathingGlow(); });
+
+        let glowAnimation = null, isGlowing = true;
+        function startBreathingGlow() {
+            if (glowAnimation) glowAnimation.kill();
+            glowAnimation = gsap.to(logo, { duration: 1.8, filter: "drop-shadow(0 0 12px #c084fc) drop-shadow(0 0 18px #f0a6ff)", repeat: -1, yoyo: true, ease: "power1.inOut", paused: true });
+            if (window.scrollY < 200 && isGlowing) glowAnimation.play();
+        }
+        function stopBreathingGlow() { isGlowing = false; if (glowAnimation) { glowAnimation.kill(); glowAnimation = null; } gsap.set(logo, { filter: "none" }); }
+        function resumeBreathingGlow() { if (window.scrollY >= 200) return; if (!isGlowing) { isGlowing = true; startBreathingGlow(); } else if (glowAnimation && glowAnimation.paused()) glowAnimation.play(); }
+        window.addEventListener('scroll', () => { if (window.scrollY < 200) resumeBreathingGlow(); else stopBreathingGlow(); });
+
+        // ---------- Logo 消散粒子（升级：140 / 90 / 70） ----------
+        const heroSection = document.getElementById('hero');
+        const slogan = document.getElementById('sloganText');
+        const fxCanvas = document.getElementById('fx-canvas');
+        let ctx = fxCanvas.getContext('2d');
+        let currentParticles = [];
+        let dissolveAnimationFrame = null;
+        function resizeFxCanvas() { fxCanvas.width = window.innerWidth; fxCanvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeFxCanvas);
+        resizeFxCanvas();
+        class Particle { constructor(x,y,c,s,vx,vy) { this.x=x; this.y=y; this.originX=x; this.originY=y; this.color=c; this.size=s; this.vx=vx; this.vy=vy; this.alpha=1; } update(p) { const e=1-Math.pow(1-p,3); this.x=this.originX+this.vx*180*e; this.y=this.originY+this.vy*180*e; this.alpha=1-e; } draw(ctx) { ctx.save(); ctx.globalAlpha=this.alpha; ctx.fillStyle=this.color; ctx.shadowBlur=6; ctx.shadowColor='#c084fc'; ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill(); ctx.restore(); } }
+        function generateParticlesFromElement(el, n) { if(!el) return []; const r=el.getBoundingClientRect(); if(r.width===0||r.height===0) return []; const c=document.createElement('canvas'); c.width=r.width; c.height=r.height; const ct=c.getContext('2d'); let cols=[]; if(el.tagName==='IMG'&&el.complete&&el.naturalWidth>0){ ct.drawImage(el,0,0,r.width,r.height); const d=ct.getImageData(0,0,r.width,r.height).data; for(let i=0;i<n;i++){ const px=Math.floor(Math.random()*r.width), py=Math.floor(Math.random()*r.height), idx=(py*r.width+px)*4; cols.push(`rgb(${d[idx]},${d[idx+1]},${d[idx+2]})`); } } else { const bc=['#e0b0ff','#c084fc','#a855f7','#d946ef','#f0a6ff']; for(let i=0;i<n;i++) cols.push(bc[Math.floor(Math.random()*bc.length)]); } const p=[]; for(let i=0;i<n;i++){ const x=r.left+Math.random()*r.width, y=r.top+Math.random()*r.height, a=Math.random()*Math.PI*2, sp=0.4+Math.random()*0.8, vx=Math.cos(a)*sp, vy=Math.sin(a)*sp, col=cols[i%cols.length], sz=2+Math.random()*5; p.push(new Particle(x,y,col,sz,vx,vy)); } return p; }
+        function updateDissolveProgress(prog) { if(!currentParticles.length && prog>0.05){ const lp=generateParticlesFromElement(logo,140); const np=generateParticlesFromElement(nameSpan,90); const sp=generateParticlesFromElement(slogan,70); currentParticles=[...lp,...np,...sp]; stopBreathingGlow(); } if(currentParticles.length){ for(let p of currentParticles) p.update(prog); const show=prog<0.05; gsap.set([logo,nameSpan,slogan],{opacity:show?1:0,visibility:show?'visible':'hidden'}); if(prog>=0.98){ if(dissolveAnimationFrame) cancelAnimationFrame(dissolveAnimationFrame); dissolveAnimationFrame=null; }else{ startParticleRender(); } } }
+        function startParticleRender(){ if(dissolveAnimationFrame) cancelAnimationFrame(dissolveAnimationFrame); function render(){ if(!ctx) return; ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height); for(let p of currentParticles) p.draw(ctx); dissolveAnimationFrame=requestAnimationFrame(render); } render(); }
+        ScrollTrigger.create({ trigger: heroSection, start:"top top", end:"+=550", scrub:1.2, onUpdate:self=>{ const prog=Math.min(1,Math.max(0,self.progress)); updateDissolveProgress(prog); }, onLeaveBack:()=>{ if(dissolveAnimationFrame) cancelAnimationFrame(dissolveAnimationFrame); dissolveAnimationFrame=null; if(ctx) ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height); currentParticles=[]; gsap.set([logo,nameSpan,slogan],{opacity:1,visibility:'visible'}); if(window.scrollY<200) resumeBreathingGlow(); } });
+
+        // ---------- 故事 & 轮播淡入 ----------
+        const storySection = document.getElementById('storySection');
+        ScrollTrigger.create({ trigger: storySection, start:"top 80%", end:"top 20%", scrub:0.8, onUpdate:self=>{ const p=Math.min(1,Math.max(0,self.progress)); const ep=1-Math.pow(1-p,2); storySection.style.opacity=ep; storySection.style.transform=`translateY(${30*(1-ep)}px)`; } });
+        const storyParas = document.querySelectorAll('#storyTextArea p');
+        if(storyParas.length) gsap.fromTo(storyParas, {opacity:0,y:20}, {opacity:1,y:0, stagger:0.2, duration:1, scrollTrigger:{ trigger:'#storySection', start:'top 80%', end:'bottom 70%', scrub:0.5 }});
+        const carouselSection = document.getElementById('carouselSection');
+        ScrollTrigger.create({ trigger: carouselSection, start:"top 80%", end:"top 20%", scrub:0.8, onUpdate:self=>{ const p=Math.min(1,Math.max(0,self.progress)); const ep=1-Math.pow(1-p,2); carouselSection.style.opacity=ep; carouselSection.style.transform=`translateY(${30*(1-ep)}px)`; } });
+        document.getElementById('closeOverlay').addEventListener('click',()=>document.getElementById('worksOverlay').classList.remove('active'));
+
+        // ---------- 光标 ----------
+        const glowCursor = document.getElementById('cursorGlow');
+        document.addEventListener('mousemove',e=>gsap.set(glowCursor,{left:e.clientX,top:e.clientY}));
+        document.querySelectorAll('a, button, .category-carousel-card, .work-card, .close-overlay, .close-detail, .carousel-arrow').forEach(el=>{
+            el.addEventListener('mouseenter',()=>gsap.to(glowCursor,{width:100,height:100,duration:0.2}));
+            el.addEventListener('mouseleave',()=>gsap.to(glowCursor,{width:60,height:60,duration:0.2}));
+        });
+    }
+
+    loadData();
+</script>
 </body>
 </html>
