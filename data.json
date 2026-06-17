@@ -68,56 +68,56 @@
           "title": "《玥茜Ⅱ》",
           "description": "玥茜二代服装设计的印花，既是玥茜诞生2.5周年的纪念图，也是FTN Studio时代的起点。",
           "images": [
-            "images/illust/yuexi2/1.webp",
-            "images/illust/yuexi2/2.webp"
+            "images/illust/玥茜二代/1.webp",
+            "images/illust/玥茜二代/2.webp"
           ]
         },
         {
           "title": "《炽心》",
           "description": "看到照片时我的内心就被深深触动了，明明是在冬天，却拍出了盛夏的感觉。<br>之所以取名为“炽心”，就是为了表现这种即便是冬季也无法阻挡的炽热之心。",
-          "src": "images/illust/hot-heart/1.webp"
+          "src": "images/illust/炽心/1.webp"
         },
         {
           "title": "《真我》",
           "description": "首张根据真人照片绘制的作品，这张板绘标志着正式可以完全脱离AI进行创作，也是对自己阶段性的检验以及尝试。<br>之所以取名为“真我”是因为这种不靠美颜，不靠化妆，而是通过纯粹的光影展示真实自我的拍摄方式深深打动了我。",
-          "src": "images/illust/real-me/1.webp"
+          "src": "images/illust/真我/1.webp"
         },
         {
           "title": "《孟云夜》",
           "description": "本意是复刻玥茜诞生的过程创造另一个角色IP，但最终因为效果不够理想而放弃。",
-          "src": "images/illust/mengyunye/1.webp"
+          "src": "images/illust/孟云夜/1.webp"
         },
         {
           "title": "《汐之心》",
           "description": "在《无想一刀》动画制作完一段时间后，我开始想念做AE动画的体验了，《汐之心》也由此诞生。<br>能看到即便全部是手绘的，也保留了很多AI特征，原因是我需要把重心放到制作AE动画上，平涂的风格也是为了更便捷地拆分可动部位。<br>最终的动画成品包含了两个表情和两套表情的变化，但不在此展示。",
-          "src": "images/illust/xizhixin/1.webp"
+          "src": "images/illust/汐之心/1.webp"
         },
         {
           "title": "《大凤》",
           "description": "在通过AI绘画提升板绘技术时，我逐渐陷入了笔刷不好用的幻觉，觉得别人有丰富的笔刷预设才能画得又快又好，但随后在观摩WLOP的作品时了解到，单靠一个19号笔刷也能画出令人惊叹的作品，于是放弃了搜罗笔刷预设的想法，转而钻研如何把一个普通笔刷用出新的高度。<br>这张《大凤》是当时最成功的一次尝试，在通过AI生成线稿后重新进行手绘，衣服的刻画几乎全部是用19号笔刷完成的，算得上是阶段性的进步。",
-          "src": "images/illust/taihou/1.webp"
+          "src": "images/illust/大凤/1.webp"
         },
         {
           "title": "《电子签名票》",
           "description": "这张签名票的由来十分戏剧，起因是我当时在网易云上发布歌曲，有一个朋友冒充粉丝私信我要电子签名，当时头脑一热就通过AI生成了一个大头照作为参考，绘制了一张电子签名票，并写上祝福发给了每个想要的粉丝，也算是好事一桩。",
-          "src": "images/illust/qianming/1.webp"
+          "src": "images/illust/电子签名票/1.webp"
         },
         {
           "title": "《月华》",
           "description": "接触AI绘画一年后，第一次尝试通过AI辅助板绘从头绘制，而不是像以往一般在AI底图上做修改，当然问题很明显，人物脸型和五官都很不自然，算是一路磕磕绊绊前进的缩影了。",
-          "src": "images/illust/yuehua/1.webp"
+          "src": "images/illust/月华/1.webp"
         },
         {
           "title": "《无想一刀》",
           "description": "2023年4月8日，当时还热衷于原神，印象最深的就是雷电将军在剧情中的无想一刀。<br>同时这也是首次脱离AI进行板绘创作，还只做了简单的AE循环动画，让背后的虚影能够挥动太刀。",
-          "src": "images/illust/genshin/1.webp"
+          "src": "images/illust/无想一刀/1.webp"
         },
         {
           "title": "《玥茜的诞生》",
           "description": "2023年4月，通过刚刚起步的AI绘画技术创造出了“玥茜”这个形象（图一为首张筛选出来的成图，图二为第一张认真进行手绘修复的图，并作为了玥茜一代的服装印花）。<br>但那时候总觉得，自己作为设计系出身，靠AI生成绘画作品根本算不得光彩，甚至有点抬不起头。后来网上关于AI绘画的声讨也愈演愈烈，虽然没有被波及，但也成了我很长一段时间的梦魇。<br>不过我始终认为AI具有绝对负面性，也并没有因为那些言论就放弃，再往后的日子里我开始通过二次手绘修复AI绘画来练习板绘，这确实是一个能够快速获得成就感的途径，当然前提是你要知道怎么改才是对的，我正是靠着自身的美术功底，以及大量观摩优秀板绘作品才不至于被AI牵着鼻子走。",
           "images": [
-            "images/illust/yuexi1/1.webp",
-            "images/illust/yuexi1/2.webp"
+            "images/illust/玥茜一代/1.webp",
+            "images/illust/玥茜一代/2.webp"
           ]
         }
       ]
@@ -131,47 +131,47 @@
           "title": "2024.2.5奶黄包漫展",
           "description": "第一次去漫展，因为社恐以及设备简陋，一度缩在角落不知所措<br>最后还是一帮热心摄影师发现了我的窘迫，让我在一旁蹭拍",
           "images": [
-            "images/photo/cos1/1.webp",
-            "images/photo/cos1/2.webp",
-            "images/photo/cos1/3.webp",
-            "images/photo/cos1/4.webp",
-            "images/photo/cos1/5.webp"
+            "images/photo/漫展1/1.webp",
+            "images/photo/漫展1/2.webp",
+            "images/photo/漫展1/3.webp",
+            "images/photo/漫展1/4.webp",
+            "images/photo/漫展1/5.webp"
           ]
         },
         {
           "title": "芊芊秀",
           "description": "大学担任学院首席摄影师时最满意的活动照",
           "images": [
-            "images/photo/show/1.webp",
-            "images/photo/show/2.webp",
-            "images/photo/show/3.webp"
+            "images/photo/芊芊秀/1.webp",
+            "images/photo/芊芊秀/2.webp",
+            "images/photo/芊芊秀/3.webp"
           ]
         },
         {
           "title": "毕业考察之旅",
           "description": "真是如同黄粱一梦，那是我大学时代最难忘的经历，可惜再也回不去了",
           "images": [
-            "images/photo/biye/1.webp",
-            "images/photo/biye/2.webp",
-            "images/photo/biye/3.webp"
+            "images/photo/毕业之旅/1.webp",
+            "images/photo/毕业之旅/2.webp",
+            "images/photo/毕业之旅/3.webp"
           ]
         },
         {
           "title": "2023.7.10约拍",
           "description": "第一次正经约人拍照，多亏是高中同学比较好交流",
           "images": [
-            "images/photo/xxj1/1.webp",
-            "images/photo/xxj1/2.webp",
-            "images/photo/xxj1/3.webp"
+            "images/photo/许欣婕约拍1/1.webp",
+            "images/photo/许欣婕约拍1/2.webp",
+            "images/photo/许欣婕约拍1/3.webp"
           ]
         },
         {
           "title": "研学之旅",
           "description": "第一次带着相机到外面拍照",
           "images": [
-            "images/photo/yanxue/1.webp",
-            "images/photo/yanxue/2.webp",
-            "images/photo/yanxue/3.webp"
+            "images/photo/研学之旅/1.webp",
+            "images/photo/研学之旅/2.webp",
+            "images/photo/研学之旅/3.webp"
           ]
         }
       ]
@@ -185,30 +185,30 @@
           "title": "《玥茜Ⅱ》",
           "description": "印有第一代玥茜图案的样衣历经三年后，因为反复清洗导致图案严重磨损了，但重新定制一件一样的绝不是最优选，玥茜二代印花应运而生，同时也纪念玥茜IP诞生的2.5周年。<br>得益于这些年来AI绘画和自身板绘技术的提升，整体精致程度全面超越了一代，并且制作了更为深入的服装美工设计。<br>这次设计也成为了迈入FTN Studio时代的开端。",
           "images": [
-            "images/fashion/yuexi2/1.webp",
-            "images/fashion/yuexi2/2.webp",
-            "images/fashion/yuexi2/3.webp",
-            "images/fashion/yuexi2/4.webp"
+            "images/fashion/玥茜二代/1.webp",
+            "images/fashion/玥茜二代/2.webp",
+            "images/fashion/玥茜二代/3.webp",
+            "images/fashion/玥茜二代/4.webp"
           ]
         },
         {
           "title": "《引擎之心》",
           "description": "“如果爱情不予回应，那就让引擎的轰鸣声淹没一切。”<br>这份服装印花设计是在遭受情感重创后制作出来的，看到消息时我如遭晴天霹雳，随后驾车回家时在高架上一路疾驰（请勿模仿，安全第一），肾上腺素飙升的快感一时间让我忘记了内心的痛苦，回家后便着手设计了这份印花。<br>当然，设计传达的意图并不是鄙视女性，更不是讽刺爱情，只是想提醒自己，也提醒各位，有时候人不能困于一件事，想想其他能给你带来快乐的东西，那才是真正值得把握的。",
           "images": [
-            "images/fashion/engine/1.webp",
-            "images/fashion/engine/2.webp",
-            "images/fashion/engine/3.webp",
-            "images/fashion/engine/4.webp",
-            "images/fashion/engine/5.webp"
+            "images/fashion/引擎之心/1.webp",
+            "images/fashion/引擎之心/2.webp",
+            "images/fashion/引擎之心/3.webp",
+            "images/fashion/引擎之心/4.webp",
+            "images/fashion/引擎之心/5.webp"
           ]
         },
         {
           "title": "《曦夜》",
           "description": "第一份严格意义上的服装设计，从图纸到布料再到裁剪缝制全部独立完成。<br>曦夜与汐夜同音，衣如其名，白色内衬与欧根纱+不对称黑色闪粉网纱，一半雾气朦胧的晨曦一半星光璀璨的夜晚。<br>",
           "images": [
-            "images/fashion/dress/1.webp",
-            "images/fashion/dress/2.webp",
-            "images/fashion/dress/3.webp"
+            "images/fashion/曦夜/1.webp",
+            "images/fashion/曦夜/2.webp",
+            "images/fashion/曦夜/3.webp"
           ]
         }
       ]
@@ -222,46 +222,46 @@
           "title": "《玥茜二代衍生手机壳》",
           "description": "手机壳需要更换了，我以往的都是找个好看的图直接定制，但刚巧玥茜二代印花设计完成不久，便干脆做了一个衍生周边设计。<br>整体设计借鉴了19世纪末新艺术运动对于自然形态与装饰美学的表达方式，将植物、曲线与框架结构融为一体，呈现出一种优雅、浪漫且具有收藏感的艺术装饰风格。",
           "images": [
-            "images/other/phone/1.webp",
-            "images/other/phone/2.webp",
-            "images/other/phone/3.webp"
+            "images/other/手机壳1/1.webp",
+            "images/other/手机壳1/2.webp",
+            "images/other/手机壳1/3.webp"
           ]
         },
         {
           "title": "《玥茜之影3代》",
           "description": "因为在网上看到了DIY机器人的教程，鬼使神差地想做一个载有玥茜IP的智能互动电子设备，在鏖战了无数个日夜，经历了无数次失败后情绪几近崩溃边缘，一度想放弃这个“痴人说梦”的想法，我抱着事不过三的想法，决定第三次再失败就彻底放弃，但最终好运还是眷顾了我，胜利的曙光最终点亮了这块小小的屏幕。<br>ps:最后的3D模型和电路焊接记录图是失败的二代",
           "images": [
-            "images/other/shadow-of-yuexi/1.webp",
-            "images/other/shadow-of-yuexi/2.webp",
-            "images/other/shadow-of-yuexi/3.webp",
-            "images/other/shadow-of-yuexi/4.webp",
-            "images/other/shadow-of-yuexi/5.webp",
-            "images/other/shadow-of-yuexi/6.webp",
-            "images/other/shadow-of-yuexi/7.webp",
-            "images/other/shadow-of-yuexi/8.webp",
-            "images/other/shadow-of-yuexi/9.webp",
-            "images/other/shadow-of-yuexi/10.webp",
-            "images/other/shadow-of-yuexi/11.webp",
-            "images/other/shadow-of-yuexi/12.webp"
+            "images/other/玥茜之影/1.webp",
+            "images/other/玥茜之影/2.webp",
+            "images/other/玥茜之影/3.webp",
+            "images/other/玥茜之影/4.webp",
+            "images/other/玥茜之影/5.webp",
+            "images/other/玥茜之影/6.webp",
+            "images/other/玥茜之影/7.webp",
+            "images/other/玥茜之影/8.webp",
+            "images/other/玥茜之影/9.webp",
+            "images/other/玥茜之影/10.webp",
+            "images/other/玥茜之影/11.webp",
+            "images/other/玥茜之影/12.webp"
           ]
         },
         {
           "title": "《曲·启明主题机箱设计》",
           "description": "这份设计就是为了打造一台独一无二的电脑机箱，同时发挥自己的设计能力（其实是顺便省200设计费）。",
           "images": [
-            "images/other/jixiang/1.webp",
-            "images/other/jixiang/2.webp",
-            "images/other/jixiang/3.webp",
-            "images/other/jixiang/4.webp"
+            "images/other/机箱/1.webp",
+            "images/other/机箱/2.webp",
+            "images/other/机箱/3.webp",
+            "images/other/机箱/4.webp"
           ]
         },
         {
           "title": "《九龙商会主题汽车装饰设计》",
           "description": "是的，一个小时候连穿衣自由都没有的人，长大后什么东西都喜欢自己做设计。<br>一份是安全带护肩，一份是车尾磁吸装饰贴。",
           "images": [
-            "images/other/car/1.webp",
-            "images/other/car/2.webp",
-            "images/other/car/3.webp"
+            "images/other/九龙商会/1.webp",
+            "images/other/九龙商会/2.webp",
+            "images/other/九龙商会/3.webp"
           ]
         }
       ]
