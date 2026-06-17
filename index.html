@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <style>
-        /* ===== 所有样式与之前保持一致，仅修改了 .work-card 的 min-height ===== */
+        /* ===== 全部样式与 V2 一致，仅 .works-grid 和 .work-card 改用 Flex 布局 ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body {
             background-color: #0a0a0a;
@@ -261,20 +261,21 @@
             z-index: 1010;
         }
         .close-overlay:hover { background: #c084fc; color: #0a0a0a; }
+
+        /* ===== 修复：使用 Flexbox 布局，替代原 Grid ===== */
         .works-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            display: flex;
+            flex-wrap: wrap;
             gap: 2rem;
+            align-content: flex-start;
             width: 85%;
             max-width: 1200px;
             max-height: 80vh;
             overflow-y: auto;
             padding: 2rem;
-            justify-items: start;
-            align-items: start;
         }
-        /* ===== 修复核心：为卡片设置最小高度，防止图片加载前塌缩重叠 ===== */
         .work-card {
+            flex: 0 0 calc(25% - 1.5rem);
             background: #1e172a;
             border-radius: 20px;
             overflow: hidden;
@@ -283,8 +284,6 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
-            width: 100%;
-            min-height: 260px; /* 关键修复：与网格最小列宽匹配，保证图片加载前也有高度 */
         }
         .work-card img {
             width: 100%;
@@ -307,6 +306,17 @@
             box-shadow: 0 15px 30px rgba(200,100,255,0.4);
             border: 1px solid rgba(200,100,255,0.6);
         }
+        /* 响应式列数 */
+        @media (max-width: 1000px) {
+            .work-card { flex: 0 0 calc(33.33% - 1.5rem); }
+        }
+        @media (max-width: 700px) {
+            .work-card { flex: 0 0 calc(50% - 1rem); }
+        }
+        @media (max-width: 450px) {
+            .work-card { flex: 0 0 100%; }
+        }
+
         .close-detail {
             position: fixed;
             top: 20px;
@@ -434,7 +444,6 @@
             cursor: pointer;
         }
         .carousel-dot.active { background: #f0a6ff; transform: scale(1.3); }
-        /* ===== 响应式调整 min-height ===== */
         @media (max-width: 800px) {
             .logo-img { width: 120px; }
             .logo-text {
@@ -456,11 +465,8 @@
                 gap: 1rem;
                 padding: 1rem;
                 width: 95%;
-                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             }
-            .work-card {
-                min-height: 160px; /* 移动端匹配列宽 */
-            }
+            .work-card { min-width: 0; }
             .detail-container {
                 flex-direction: column;
                 width: 95%;
@@ -479,10 +485,6 @@
             }
         }
         @media (max-width: 480px) {
-            .works-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-            .work-card {
-                min-height: 140px; /* 小屏手机匹配列宽 */
-            }
             .category-carousel-card { width: 140px; }
             .category-carousel-card.center { width: 200px; }
             .carousel-arrow { width: 30px; height: 30px; font-size: 1.2rem; }
@@ -491,7 +493,6 @@
     </style>
 </head>
 <body>
-<!-- 注意：HTML 结构与之前完全一致，无需修改 -->
 <div id="particles-js"></div>
 <div class="loading-bar" id="loadingBar"></div>
 <div class="cursor-glow" id="cursorGlow"></div>
@@ -533,42 +534,16 @@
 
 <script>
     // ================================================================
-    //  🔧 配置区：您的 CDN 根地址（末尾加 /）
+    //  🚀 配置区：您的 CDN 根地址（末尾加 /），留空则使用相对路径
     // ================================================================
-    const IMAGE_BASE_URL = 'https://images.ftn-studio.top/';
+    const IMAGE_BASE_URL = 'https://images.ftn-studio.top/';  // 例如 'https://images.ftn-studio.top/'
 
-    // ---------- 以下脚本与上一版完全一致，未做改动 ----------
+    // ---------- 以下 JS 完全基于 V2 稳定版，并整合了所有升级 ----------
     let appData = null;
     let currentCategoryWorks = [];
     let carouselIndex = 0;
     let categories = [];
     let carouselCardNodes = [null, null, null];
-
-    function toCdnUrl(relativePath) {
-        if (!relativePath) return '';
-        if (/^https?:\/\//i.test(relativePath)) return relativePath;
-        return IMAGE_BASE_URL + relativePath;
-    }
-
-    function replaceImageUrls(obj) {
-        if (!obj || typeof obj !== 'object') return obj;
-        if (Array.isArray(obj)) {
-            return obj.map(item => replaceImageUrls(item));
-        }
-        const newObj = { ...obj };
-        for (let key in newObj) {
-            if (key === 'src' || key === 'cover' || key === 'storyImage') {
-                if (typeof newObj[key] === 'string') {
-                    newObj[key] = toCdnUrl(newObj[key]);
-                }
-            } else if (key === 'images' && Array.isArray(newObj[key])) {
-                newObj[key] = newObj[key].map(url => toCdnUrl(url));
-            } else if (typeof newObj[key] === 'object' && newObj[key] !== null) {
-                newObj[key] = replaceImageUrls(newObj[key]);
-            }
-        }
-        return newObj;
-    }
 
     function escapeHtml(str) {
         if (!str) return '';
@@ -591,14 +566,17 @@
             }
             return;
         }
-        const cdnUrl = toCdnUrl(originalUrl);
-        const lowerUrl = cdnUrl.toLowerCase();
+        let finalUrl = originalUrl;
+        if (IMAGE_BASE_URL && !/^https?:\/\//i.test(originalUrl)) {
+            finalUrl = IMAGE_BASE_URL + originalUrl;
+        }
+        const lowerUrl = finalUrl.toLowerCase();
         if (lowerUrl.endsWith('.webp')) {
-            const fallbackJpg = cdnUrl.slice(0, -5) + '.jpg';
-            const fallbackPng = cdnUrl.slice(0, -5) + '.png';
-            imgElement.src = cdnUrl;
+            const fallbackJpg = finalUrl.slice(0, -5) + '.jpg';
+            const fallbackPng = finalUrl.slice(0, -5) + '.png';
+            imgElement.src = finalUrl;
             imgElement.onerror = function() {
-                if (this.src === cdnUrl) {
+                if (this.src === finalUrl) {
                     this.src = fallbackJpg;
                 } else if (this.src === fallbackJpg) {
                     this.src = fallbackPng;
@@ -609,7 +587,7 @@
                 }
             };
         } else {
-            imgElement.src = cdnUrl;
+            imgElement.src = finalUrl;
             imgElement.onerror = function() {
                 this.onerror = null;
                 this.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
@@ -623,6 +601,32 @@
         let protected = desc.replace(/<br\s*\/?>/gi, '{{BR}}');
         let withBreaks = protected.replace(/\n/g, '<br>');
         return withBreaks.replace(/\{\{BR\}\}/g, '<br>');
+    }
+
+    // 图片路径替换函数（支持 CDN）
+    function replaceImageUrls(obj) {
+        if (!obj || typeof obj !== 'object') return obj;
+        if (Array.isArray(obj)) {
+            return obj.map(item => replaceImageUrls(item));
+        }
+        const newObj = { ...obj };
+        for (let key in newObj) {
+            if (key === 'src' || key === 'cover' || key === 'storyImage') {
+                if (typeof newObj[key] === 'string' && IMAGE_BASE_URL && !/^https?:\/\//i.test(newObj[key])) {
+                    newObj[key] = IMAGE_BASE_URL + newObj[key];
+                }
+            } else if (key === 'images' && Array.isArray(newObj[key])) {
+                newObj[key] = newObj[key].map(url => {
+                    if (typeof url === 'string' && IMAGE_BASE_URL && !/^https?:\/\//i.test(url)) {
+                        return IMAGE_BASE_URL + url;
+                    }
+                    return url;
+                });
+            } else if (typeof newObj[key] === 'object' && newObj[key] !== null) {
+                newObj[key] = replaceImageUrls(newObj[key]);
+            }
+        }
+        return newObj;
     }
 
     async function loadData() {
@@ -641,7 +645,7 @@
             initFullSite();
         } catch(e) {
             console.warn('加载 data.json 失败，使用占位数据');
-            appData = replaceImageUrls(getPlaceholderData());
+            appData = getPlaceholderData();
             initFullSite();
         }
     }
@@ -683,6 +687,7 @@
         };
     }
 
+    // ===== 粒子特效（升级：背景 80） =====
     function initParticles() {
         particlesJS("particles-js", {
             particles: {
@@ -704,6 +709,7 @@
         });
     }
 
+    // ===== 轮播 =====
     function initCarouselNodes() {
         const track = document.getElementById('carouselTrack');
         if (!track) return;
@@ -753,6 +759,7 @@
     function prevCategory() { carouselIndex = (carouselIndex - 1 + categories.length) % categories.length; renderCarouselWithTransition(); }
     function renderCarousel() { initCarouselNodes(); updateCarouselCards(); const t = document.getElementById('carouselTrack'); if (t) t.style.opacity = 1; }
 
+    // ===== 打开分类（含卡片 stagger 入场动画） =====
     function openCategoryWorks(catId) {
         const category = categories.find(c => c.id === catId);
         if (!category) return;
@@ -792,6 +799,7 @@
         grid.appendChild(fragment);
         overlay.classList.add('active');
 
+        // ---- 卡片入场动画（stagger 0.06s） ----
         const cards = grid.querySelectorAll('.work-card');
         gsap.set(cards, { opacity: 0, y: 24 });
         gsap.to(cards, {
@@ -804,6 +812,7 @@
         });
     }
 
+    // ===== 作品详情 =====
     let currentDetailImages = [];
     let currentDetailImageIndex = 0;
     let detailActive = false;
@@ -914,6 +923,7 @@
     }
     document.getElementById('closeDetail').addEventListener('click', closeDetailOverlay);
 
+    // ===== 主初始化 =====
     function initFullSite() {
         initParticles();
         document.getElementById('storyTextArea').innerHTML = appData.story;
@@ -956,6 +966,7 @@
         function resumeBreathingGlow() { if (window.scrollY >= 200) return; if (!isGlowing) { isGlowing = true; startBreathingGlow(); } else if (glowAnimation && glowAnimation.paused()) glowAnimation.play(); }
         window.addEventListener('scroll', () => { if (window.scrollY < 200) resumeBreathingGlow(); else stopBreathingGlow(); });
 
+        // ===== Logo 消散粒子（升级：140 / 90 / 70） =====
         const heroSection = document.getElementById('hero');
         const slogan = document.getElementById('sloganText');
         const fxCanvas = document.getElementById('fx-canvas');
@@ -971,6 +982,7 @@
         function startParticleRender(){ if(dissolveAnimationFrame) cancelAnimationFrame(dissolveAnimationFrame); function render(){ if(!ctx) return; ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height); for(let p of currentParticles) p.draw(ctx); dissolveAnimationFrame=requestAnimationFrame(render); } render(); }
         ScrollTrigger.create({ trigger: heroSection, start:"top top", end:"+=550", scrub:1.2, onUpdate:self=>{ const prog=Math.min(1,Math.max(0,self.progress)); updateDissolveProgress(prog); }, onLeaveBack:()=>{ if(dissolveAnimationFrame) cancelAnimationFrame(dissolveAnimationFrame); dissolveAnimationFrame=null; if(ctx) ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height); currentParticles=[]; gsap.set([logo,nameSpan,slogan],{opacity:1,visibility:'visible'}); if(window.scrollY<200) resumeBreathingGlow(); } });
 
+        // ===== 故事 & 轮播淡入 =====
         const storySection = document.getElementById('storySection');
         ScrollTrigger.create({ trigger: storySection, start:"top 80%", end:"top 20%", scrub:0.8, onUpdate:self=>{ const p=Math.min(1,Math.max(0,self.progress)); const ep=1-Math.pow(1-p,2); storySection.style.opacity=ep; storySection.style.transform=`translateY(${30*(1-ep)}px)`; } });
         const storyParas = document.querySelectorAll('#storyTextArea p');
@@ -979,6 +991,7 @@
         ScrollTrigger.create({ trigger: carouselSection, start:"top 80%", end:"top 20%", scrub:0.8, onUpdate:self=>{ const p=Math.min(1,Math.max(0,self.progress)); const ep=1-Math.pow(1-p,2); carouselSection.style.opacity=ep; carouselSection.style.transform=`translateY(${30*(1-ep)}px)`; } });
         document.getElementById('closeOverlay').addEventListener('click',()=>document.getElementById('worksOverlay').classList.remove('active'));
 
+        // ===== 光标 =====
         const glowCursor = document.getElementById('cursorGlow');
         document.addEventListener('mousemove',e=>gsap.set(glowCursor,{left:e.clientX,top:e.clientY}));
         document.querySelectorAll('a, button, .category-carousel-card, .work-card, .close-overlay, .close-detail, .carousel-arrow').forEach(el=>{
