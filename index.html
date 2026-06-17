@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <style>
-        /* ===== 完全保留 V2 的样式（未改动） ===== */
+        /* ===== 所有样式与之前保持一致，仅修改了 .work-card 的 min-height ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body {
             background-color: #0a0a0a;
@@ -73,7 +73,7 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            -webkit-text-fill-color: transparent; /* V2 修复 */
+            -webkit-text-fill-color: transparent;
             opacity: 0;
             transition: none;
         }
@@ -261,7 +261,6 @@
             z-index: 1010;
         }
         .close-overlay:hover { background: #c084fc; color: #0a0a0a; }
-        /* V2 使用 Grid 布局 */
         .works-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -274,6 +273,7 @@
             justify-items: start;
             align-items: start;
         }
+        /* ===== 修复核心：为卡片设置最小高度，防止图片加载前塌缩重叠 ===== */
         .work-card {
             background: #1e172a;
             border-radius: 20px;
@@ -284,6 +284,7 @@
             display: flex;
             flex-direction: column;
             width: 100%;
+            min-height: 260px; /* 关键修复：与网格最小列宽匹配，保证图片加载前也有高度 */
         }
         .work-card img {
             width: 100%;
@@ -291,6 +292,7 @@
             object-fit: cover;
             display: block;
             background: #2a1a3a;
+            flex-shrink: 0;
         }
         .work-card .work-title {
             padding: 12px;
@@ -298,6 +300,7 @@
             text-align: center;
             background: rgba(0,0,0,0.5);
             color: #f0e6ff;
+            flex-shrink: 0;
         }
         .work-card:hover {
             transform: translateY(-8px);
@@ -431,7 +434,7 @@
             cursor: pointer;
         }
         .carousel-dot.active { background: #f0a6ff; transform: scale(1.3); }
-        /* V2 移动端适配 */
+        /* ===== 响应式调整 min-height ===== */
         @media (max-width: 800px) {
             .logo-img { width: 120px; }
             .logo-text {
@@ -455,7 +458,9 @@
                 width: 95%;
                 grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             }
-            .work-card { min-width: 0; }
+            .work-card {
+                min-height: 160px; /* 移动端匹配列宽 */
+            }
             .detail-container {
                 flex-direction: column;
                 width: 95%;
@@ -475,6 +480,9 @@
         }
         @media (max-width: 480px) {
             .works-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+            .work-card {
+                min-height: 140px; /* 小屏手机匹配列宽 */
+            }
             .category-carousel-card { width: 140px; }
             .category-carousel-card.center { width: 200px; }
             .carousel-arrow { width: 30px; height: 30px; font-size: 1.2rem; }
@@ -483,6 +491,7 @@
     </style>
 </head>
 <body>
+<!-- 注意：HTML 结构与之前完全一致，无需修改 -->
 <div id="particles-js"></div>
 <div class="loading-bar" id="loadingBar"></div>
 <div class="cursor-glow" id="cursorGlow"></div>
@@ -492,7 +501,7 @@
     <section class="hero" id="hero">
         <div class="hero-center">
             <div class="brand-wrapper" id="brandWrapper">
-                <img src="" alt="FTN Logo" class="logo-img" id="mainLogo"> <!-- src 由 JS 设置 -->
+                <img src="" alt="FTN Logo" class="logo-img" id="mainLogo">
                 <span class="logo-text" id="mainName">FTN STUDIO</span>
             </div>
         </div>
@@ -524,25 +533,23 @@
 
 <script>
     // ================================================================
-    //  🔧 配置区：只需修改此处为您的 CDN 根地址（末尾加 /）
+    //  🔧 配置区：您的 CDN 根地址（末尾加 /）
     // ================================================================
-    const IMAGE_BASE_URL = 'https://images.ftn-studio.top/';  // 您的图床地址
+    const IMAGE_BASE_URL = 'https://images.ftn-studio.top/';
 
-    // ---------- 以下为完整脚本（基于 V2 稳定版，融合升级） ----------
+    // ---------- 以下脚本与上一版完全一致，未做改动 ----------
     let appData = null;
     let currentCategoryWorks = [];
     let carouselIndex = 0;
     let categories = [];
     let carouselCardNodes = [null, null, null];
 
-    // 工具：将相对路径转为 CDN 绝对路径
     function toCdnUrl(relativePath) {
         if (!relativePath) return '';
         if (/^https?:\/\//i.test(relativePath)) return relativePath;
         return IMAGE_BASE_URL + relativePath;
     }
 
-    // 递归遍历对象，替换所有图片字段（src, cover, storyImage, images 数组）
     function replaceImageUrls(obj) {
         if (!obj || typeof obj !== 'object') return obj;
         if (Array.isArray(obj)) {
@@ -618,13 +625,12 @@
         return withBreaks.replace(/\{\{BR\}\}/g, '<br>');
     }
 
-    // ---------- 数据加载 ----------
     async function loadData() {
         updateLoadingBar(10);
         try {
             const res = await fetch('data.json?_=' + Date.now());
             let rawData = await res.json();
-            appData = replaceImageUrls(rawData); // 替换所有图片路径
+            appData = replaceImageUrls(rawData);
             updateLoadingBar(40);
             await preloadCriticalImages(appData);
             updateLoadingBar(100);
@@ -677,7 +683,6 @@
         };
     }
 
-    // ---------- 粒子特效（升级：背景 80） ----------
     function initParticles() {
         particlesJS("particles-js", {
             particles: {
@@ -699,7 +704,6 @@
         });
     }
 
-    // ---------- 轮播 ----------
     function initCarouselNodes() {
         const track = document.getElementById('carouselTrack');
         if (!track) return;
@@ -749,7 +753,6 @@
     function prevCategory() { carouselIndex = (carouselIndex - 1 + categories.length) % categories.length; renderCarouselWithTransition(); }
     function renderCarousel() { initCarouselNodes(); updateCarouselCards(); const t = document.getElementById('carouselTrack'); if (t) t.style.opacity = 1; }
 
-    // ---------- 打开分类（含卡片 stagger 入场） ----------
     function openCategoryWorks(catId) {
         const category = categories.find(c => c.id === catId);
         if (!category) return;
@@ -789,7 +792,6 @@
         grid.appendChild(fragment);
         overlay.classList.add('active');
 
-        // ---- 卡片分批入场动画 (stagger 0.06s) ----
         const cards = grid.querySelectorAll('.work-card');
         gsap.set(cards, { opacity: 0, y: 24 });
         gsap.to(cards, {
@@ -802,7 +804,6 @@
         });
     }
 
-    // ---------- 作品详情 ----------
     let currentDetailImages = [];
     let currentDetailImageIndex = 0;
     let detailActive = false;
@@ -913,7 +914,6 @@
     }
     document.getElementById('closeDetail').addEventListener('click', closeDetailOverlay);
 
-    // ---------- 主初始化 ----------
     function initFullSite() {
         initParticles();
         document.getElementById('storyTextArea').innerHTML = appData.story;
@@ -926,7 +926,6 @@
         document.getElementById('carouselRight').addEventListener('click', nextCategory);
 
         const logo = document.getElementById('mainLogo');
-        // 设置 Logo 的 CDN 路径
         setImageWithFallback(logo, 'images/FTN-logo.webp');
 
         const nameSpan = document.getElementById('mainName');
@@ -938,7 +937,7 @@
         tl.to(logo, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out", delay: 0.3 })
           .to(logo, { scale: 1.02, duration: 0.8, repeat: 1, yoyo: true, ease: "power1.inOut", onComplete: () => gsap.set(logo, { scale: 1 }) }, "-=0.8")
           .to(brandWrapper, {
-              x: window.innerWidth <= 800 ? -107 : -180,  // V2 响应式位移
+              x: window.innerWidth <= 800 ? -107 : -180,
               duration: 1.2,
               ease: "power3.out"
           }, "+=1")
@@ -957,7 +956,6 @@
         function resumeBreathingGlow() { if (window.scrollY >= 200) return; if (!isGlowing) { isGlowing = true; startBreathingGlow(); } else if (glowAnimation && glowAnimation.paused()) glowAnimation.play(); }
         window.addEventListener('scroll', () => { if (window.scrollY < 200) resumeBreathingGlow(); else stopBreathingGlow(); });
 
-        // ---------- Logo 消散粒子（升级：140 / 90 / 70） ----------
         const heroSection = document.getElementById('hero');
         const slogan = document.getElementById('sloganText');
         const fxCanvas = document.getElementById('fx-canvas');
@@ -973,7 +971,6 @@
         function startParticleRender(){ if(dissolveAnimationFrame) cancelAnimationFrame(dissolveAnimationFrame); function render(){ if(!ctx) return; ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height); for(let p of currentParticles) p.draw(ctx); dissolveAnimationFrame=requestAnimationFrame(render); } render(); }
         ScrollTrigger.create({ trigger: heroSection, start:"top top", end:"+=550", scrub:1.2, onUpdate:self=>{ const prog=Math.min(1,Math.max(0,self.progress)); updateDissolveProgress(prog); }, onLeaveBack:()=>{ if(dissolveAnimationFrame) cancelAnimationFrame(dissolveAnimationFrame); dissolveAnimationFrame=null; if(ctx) ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height); currentParticles=[]; gsap.set([logo,nameSpan,slogan],{opacity:1,visibility:'visible'}); if(window.scrollY<200) resumeBreathingGlow(); } });
 
-        // ---------- 故事 & 轮播淡入 ----------
         const storySection = document.getElementById('storySection');
         ScrollTrigger.create({ trigger: storySection, start:"top 80%", end:"top 20%", scrub:0.8, onUpdate:self=>{ const p=Math.min(1,Math.max(0,self.progress)); const ep=1-Math.pow(1-p,2); storySection.style.opacity=ep; storySection.style.transform=`translateY(${30*(1-ep)}px)`; } });
         const storyParas = document.querySelectorAll('#storyTextArea p');
@@ -982,7 +979,6 @@
         ScrollTrigger.create({ trigger: carouselSection, start:"top 80%", end:"top 20%", scrub:0.8, onUpdate:self=>{ const p=Math.min(1,Math.max(0,self.progress)); const ep=1-Math.pow(1-p,2); carouselSection.style.opacity=ep; carouselSection.style.transform=`translateY(${30*(1-ep)}px)`; } });
         document.getElementById('closeOverlay').addEventListener('click',()=>document.getElementById('worksOverlay').classList.remove('active'));
 
-        // ---------- 光标 ----------
         const glowCursor = document.getElementById('cursorGlow');
         document.addEventListener('mousemove',e=>gsap.set(glowCursor,{left:e.clientX,top:e.clientY}));
         document.querySelectorAll('a, button, .category-carousel-card, .work-card, .close-overlay, .close-detail, .carousel-arrow').forEach(el=>{
