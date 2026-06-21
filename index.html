@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <style>
-        /* ===== 全部样式与 V2 一致，仅 .works-grid 和 .work-card 改用 Flex 布局 ===== */
+        /* ===== 完全复制 V2 样式，未做任何改动 ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body {
             background-color: #0a0a0a;
@@ -262,7 +262,7 @@
         }
         .close-overlay:hover { background: #c084fc; color: #0a0a0a; }
 
-        /* ===== 修复：使用 Flexbox 布局，替代原 Grid ===== */
+        /* ===== V2 使用 Flex 布局（作品网格） ===== */
         .works-grid {
             display: flex;
             flex-wrap: wrap;
@@ -306,7 +306,6 @@
             box-shadow: 0 15px 30px rgba(200,100,255,0.4);
             border: 1px solid rgba(200,100,255,0.6);
         }
-        /* 响应式列数 */
         @media (max-width: 1000px) {
             .work-card { flex: 0 0 calc(33.33% - 1.5rem); }
         }
@@ -493,514 +492,531 @@
     </style>
 </head>
 <body>
-<div id="particles-js"></div>
-<div class="loading-bar" id="loadingBar"></div>
-<div class="cursor-glow" id="cursorGlow"></div>
-<canvas id="fx-canvas"></canvas>
+    <!-- 原有内容 -->
+    <div id="particles-js"></div>
+    <div class="loading-bar" id="loadingBar"></div>
+    <div class="cursor-glow" id="cursorGlow"></div>
+    <canvas id="fx-canvas"></canvas>
 
-<main>
-    <section class="hero" id="hero">
-        <div class="hero-center">
-            <div class="brand-wrapper" id="brandWrapper">
-                <img src="" alt="FTN Logo" class="logo-img" id="mainLogo">
-                <span class="logo-text" id="mainName">FTN STUDIO</span>
+    <main>
+        <section class="hero" id="hero">
+            <div class="hero-center">
+                <div class="brand-wrapper" id="brandWrapper">
+                    <img src="https://images.ftn-studio.top/images/FTN-logo.webp" alt="FTN Logo" class="logo-img" id="mainLogo">
+                    <span class="logo-text" id="mainName">FTN STUDIO</span>
+                </div>
             </div>
-        </div>
-        <div class="slogan" id="sloganText">致力于向世界展示不务正业的热爱</div>
-        <div class="scroll-hint" id="scrollHint"></div>
-    </section>
+            <div class="slogan" id="sloganText">致力于向世界展示不务正业的热爱</div>
+            <div class="scroll-hint" id="scrollHint"></div>
+        </section>
 
-    <section class="story-section" id="storySection">
-        <div class="story-text" id="storyTextArea"></div>
-    </section>
+        <section class="story-section" id="storySection">
+            <div class="story-text" id="storyTextArea"></div>
+        </section>
 
-    <section class="carousel-section" id="carouselSection">
-        <div class="carousel-container">
-            <div class="carousel-arrow left" id="carouselLeft">‹</div>
-            <div class="carousel-track" id="carouselTrack"></div>
-            <div class="carousel-arrow right" id="carouselRight">›</div>
-        </div>
-    </section>
-</main>
+        <section class="carousel-section" id="carouselSection">
+            <div class="carousel-container">
+                <div class="carousel-arrow left" id="carouselLeft">‹</div>
+                <div class="carousel-track" id="carouselTrack"></div>
+                <div class="carousel-arrow right" id="carouselRight">›</div>
+            </div>
+        </section>
+    </main>
 
-<div class="overlay" id="worksOverlay">
-    <div class="close-overlay" id="closeOverlay">⟵ 返回</div>
-    <div class="works-grid" id="worksGrid"></div>
-</div>
-<div class="detail-overlay" id="detailOverlay">
-    <button class="close-detail" id="closeDetail">✕</button>
-    <div class="detail-container" id="detailContainer"></div>
-</div>
+    <div class="overlay" id="worksOverlay">
+        <div class="close-overlay" id="closeOverlay">⟵ 返回</div>
+        <div class="works-grid" id="worksGrid"></div>
+    </div>
+    <div class="detail-overlay" id="detailOverlay">
+        <button class="close-detail" id="closeDetail">✕</button>
+        <div class="detail-container" id="detailContainer"></div>
+    </div>
 
-<script>
-    // ================================================================
-    //  🚀 配置区：您的 CDN 根地址（末尾加 /），留空则使用相对路径
-    // ================================================================
-    const IMAGE_BASE_URL = 'https://images.ftn-studio.top/';  // 例如 'https://images.ftn-studio.top/'
+    <script>
+        // ================================================================
+        //  CDN 配置
+        // ================================================================
+        const IMAGE_BASE_URL = 'https://images.ftn-studio.top/';  // 请按需修改
 
-    // ---------- 以下 JS 完全基于 V2 稳定版，并整合了所有升级 ----------
-    let appData = null;
-    let currentCategoryWorks = [];
-    let carouselIndex = 0;
-    let categories = [];
-    let carouselCardNodes = [null, null, null];
+        // ---------- 原有 V2 全局变量 ----------
+        let appData = null;
+        let currentCategoryWorks = [];
+        let carouselIndex = 0;
+        let categories = [];
+        let carouselCardNodes = [null, null, null];
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>"']/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            if (m === '"') return '&quot;';
-            if (m === "'") return '&#39;';
-            return m;
-        });
-    }
+        // ---------- 原有 V2 函数（完全保留，未改动） ----------
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>"']/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                if (m === '"') return '&quot;';
+                if (m === "'") return '&#39;';
+                return m;
+            });
+        }
 
-    function setImageWithFallback(imgElement, originalUrl) {
-        if (!imgElement || !originalUrl) {
-            if (imgElement) {
-                imgElement.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-                imgElement.style.backgroundColor = '#2a1a3a';
-                imgElement.onerror = null;
+        function setImageWithFallback(imgElement, originalUrl) {
+            if (!imgElement || !originalUrl) {
+                if (imgElement) {
+                    imgElement.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+                    imgElement.style.backgroundColor = '#2a1a3a';
+                    imgElement.onerror = null;
+                }
+                return;
             }
-            return;
-        }
-        let finalUrl = originalUrl;
-        if (IMAGE_BASE_URL && !/^https?:\/\//i.test(originalUrl)) {
-            finalUrl = IMAGE_BASE_URL + originalUrl;
-        }
-        const lowerUrl = finalUrl.toLowerCase();
-        if (lowerUrl.endsWith('.webp')) {
-            const fallbackJpg = finalUrl.slice(0, -5) + '.jpg';
-            const fallbackPng = finalUrl.slice(0, -5) + '.png';
-            imgElement.src = finalUrl;
-            imgElement.onerror = function() {
-                if (this.src === finalUrl) {
-                    this.src = fallbackJpg;
-                } else if (this.src === fallbackJpg) {
-                    this.src = fallbackPng;
-                } else {
+            let finalUrl = originalUrl;
+            if (IMAGE_BASE_URL && !/^https?:\/\//i.test(originalUrl)) {
+                finalUrl = IMAGE_BASE_URL + originalUrl;
+            }
+            const lowerUrl = finalUrl.toLowerCase();
+            if (lowerUrl.endsWith('.webp')) {
+                const fallbackJpg = finalUrl.slice(0, -5) + '.jpg';
+                const fallbackPng = finalUrl.slice(0, -5) + '.png';
+                imgElement.src = finalUrl;
+                imgElement.onerror = function() {
+                    if (this.src === finalUrl) {
+                        this.src = fallbackJpg;
+                    } else if (this.src === fallbackJpg) {
+                        this.src = fallbackPng;
+                    } else {
+                        this.onerror = null;
+                        this.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+                        this.style.backgroundColor = '#2a1a3a';
+                    }
+                };
+            } else {
+                imgElement.src = finalUrl;
+                imgElement.onerror = function() {
                     this.onerror = null;
                     this.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
                     this.style.backgroundColor = '#2a1a3a';
-                }
-            };
-        } else {
-            imgElement.src = finalUrl;
-            imgElement.onerror = function() {
-                this.onerror = null;
-                this.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-                this.style.backgroundColor = '#2a1a3a';
-            };
-        }
-    }
-
-    function formatDescription(desc) {
-        if (!desc) return '';
-        let protected = desc.replace(/<br\s*\/?>/gi, '{{BR}}');
-        let withBreaks = protected.replace(/\n/g, '<br>');
-        return withBreaks.replace(/\{\{BR\}\}/g, '<br>');
-    }
-
-    // 图片路径替换函数（支持 CDN）
-    function replaceImageUrls(obj) {
-        if (!obj || typeof obj !== 'object') return obj;
-        if (Array.isArray(obj)) {
-            return obj.map(item => replaceImageUrls(item));
-        }
-        const newObj = { ...obj };
-        for (let key in newObj) {
-            if (key === 'src' || key === 'cover' || key === 'storyImage') {
-                if (typeof newObj[key] === 'string' && IMAGE_BASE_URL && !/^https?:\/\//i.test(newObj[key])) {
-                    newObj[key] = IMAGE_BASE_URL + newObj[key];
-                }
-            } else if (key === 'images' && Array.isArray(newObj[key])) {
-                newObj[key] = newObj[key].map(url => {
-                    if (typeof url === 'string' && IMAGE_BASE_URL && !/^https?:\/\//i.test(url)) {
-                        return IMAGE_BASE_URL + url;
-                    }
-                    return url;
-                });
-            } else if (typeof newObj[key] === 'object' && newObj[key] !== null) {
-                newObj[key] = replaceImageUrls(newObj[key]);
+                };
             }
         }
-        return newObj;
-    }
 
-    async function loadData() {
-        updateLoadingBar(10);
-        try {
-            const res = await fetch('data.json?_=' + Date.now());
-            let rawData = await res.json();
-            appData = replaceImageUrls(rawData);
-            updateLoadingBar(40);
-            await preloadCriticalImages(appData);
-            updateLoadingBar(100);
-            setTimeout(() => {
-                document.getElementById('loadingBar').style.width = '100%';
-                setTimeout(() => document.getElementById('loadingBar').style.opacity = '0', 500);
-            }, 200);
-            initFullSite();
-        } catch(e) {
-            console.warn('加载 data.json 失败，使用占位数据');
-            appData = getPlaceholderData();
-            initFullSite();
+        function formatDescription(desc) {
+            if (!desc) return '';
+            let protected = desc.replace(/<br\s*\/?>/gi, '{{BR}}');
+            let withBreaks = protected.replace(/\n/g, '<br>');
+            return withBreaks.replace(/\{\{BR\}\}/g, '<br>');
         }
-    }
 
-    function updateLoadingBar(percent) {
-        const bar = document.getElementById('loadingBar');
-        bar.style.width = Math.min(percent, 100) + '%';
-    }
+        // ---------- 原有 V2 图片路径替换 ----------
+        function replaceImageUrls(obj) {
+            if (!obj || typeof obj !== 'object') return obj;
+            if (Array.isArray(obj)) {
+                return obj.map(item => replaceImageUrls(item));
+            }
+            const newObj = { ...obj };
+            for (let key in newObj) {
+                if (key === 'src' || key === 'cover' || key === 'storyImage') {
+                    if (typeof newObj[key] === 'string' && IMAGE_BASE_URL && !/^https?:\/\//i.test(newObj[key])) {
+                        newObj[key] = IMAGE_BASE_URL + newObj[key];
+                    }
+                } else if (key === 'images' && Array.isArray(newObj[key])) {
+                    newObj[key] = newObj[key].map(url => {
+                        if (typeof url === 'string' && IMAGE_BASE_URL && !/^https?:\/\//i.test(url)) {
+                            return IMAGE_BASE_URL + url;
+                        }
+                        return url;
+                    });
+                } else if (typeof newObj[key] === 'object' && newObj[key] !== null) {
+                    newObj[key] = replaceImageUrls(newObj[key]);
+                }
+            }
+            return newObj;
+        }
 
-    async function preloadCriticalImages(data) {
-        const urls = [];
-        if(data.storyImage) urls.push(data.storyImage);
-        data.categories.forEach(cat => {
-            if(cat.cover) urls.push(cat.cover);
-            if(cat.works[0] && cat.works[0].src) urls.push(cat.works[0].src);
-            else if(cat.works[0] && cat.works[0].images && cat.works[0].images[0]) urls.push(cat.works[0].images[0]);
-        });
-        let loaded = 0;
-        for(let url of urls) {
-            await new Promise(resolve => {
-                const img = new Image();
-                img.onload = img.onerror = () => {
-                    loaded++;
-                    updateLoadingBar(40 + (loaded/urls.length)*60);
-                    resolve();
-                };
-                img.src = url;
+        // ---------- 原有 V2 数据加载 ----------
+        async function loadData() {
+            updateLoadingBar(10);
+            try {
+                const res = await fetch('data.json?_=' + Date.now());
+                let rawData = await res.json();
+                appData = replaceImageUrls(rawData);
+                updateLoadingBar(40);
+                await preloadCriticalImages(appData);
+                updateLoadingBar(100);
+                setTimeout(() => {
+                    document.getElementById('loadingBar').style.width = '100%';
+                    setTimeout(() => document.getElementById('loadingBar').style.opacity = '0', 500);
+                }, 200);
+                initFullSite();
+            } catch(e) {
+                console.warn('加载 data.json 失败，使用占位数据');
+                appData = getPlaceholderData();
+                initFullSite();
+            }
+        }
+
+        function updateLoadingBar(percent) {
+            const bar = document.getElementById('loadingBar');
+            bar.style.width = Math.min(percent, 100) + '%';
+        }
+
+        async function preloadCriticalImages(data) {
+            const urls = [];
+            if(data.storyImage) urls.push(data.storyImage);
+            data.categories.forEach(cat => {
+                if(cat.cover) urls.push(cat.cover);
+                if(cat.works[0] && cat.works[0].src) urls.push(cat.works[0].src);
+                else if(cat.works[0] && cat.works[0].images && cat.works[0].images[0]) urls.push(cat.works[0].images[0]);
+            });
+            let loaded = 0;
+            for(let url of urls) {
+                await new Promise(resolve => {
+                    const img = new Image();
+                    img.onload = img.onerror = () => {
+                        loaded++;
+                        updateLoadingBar(40 + (loaded/urls.length)*60);
+                        resolve();
+                    };
+                    img.src = url;
+                });
+            }
+        }
+
+        function getPlaceholderData() {
+            return {
+                studioName: "FTN STUDIO",
+                slogan: "致力于向世界展示不务正业的热爱",
+                story: "<p>花汐夜（Flower·Tidal·Night）...</p>",
+                storyImage: "images/story.webp",
+                categories: []
+            };
+        }
+
+        // ---------- 原有 V2 粒子 ----------
+        function initParticles() {
+            particlesJS("particles-js", {
+                particles: {
+                    number: { value: 50, density: { enable: true, value_area: 800 } },
+                    color: { value: "#fa67b2" },
+                    shape: { type: "circle" },
+                    opacity: { value: 0.5, random: true },
+                    size: { value: 3, random: true },
+                    line_linked: { enable: true, distance: 150, color: "#9d4edd", opacity: 0.3, width: 1 },
+                    move: { enable: true, speed: 2, direction: "none", random: true }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: {
+                        onhover: { enable: true, mode: "repulse" },
+                        onclick: { enable: true, mode: "push" }
+                    }
+                }
             });
         }
-    }
 
-    function getPlaceholderData() {
-        return {
-            studioName: "FTN STUDIO",
-            slogan: "致力于向世界展示不务正业的热爱",
-            story: "<p>花汐夜（Flower·Tidal·Night）...</p>",
-            storyImage: "images/story.webp",
-            categories: []
-        };
-    }
-
-    // ===== 粒子特效（升级：背景 80） =====
-    function initParticles() {
-        particlesJS("particles-js", {
-            particles: {
-                number: { value: 80, density: { enable: true, value_area: 800 } },
-                color: { value: "#fa67b2" },
-                shape: { type: "circle" },
-                opacity: { value: 0.5, random: true },
-                size: { value: 3, random: true },
-                line_linked: { enable: true, distance: 150, color: "#9d4edd", opacity: 0.3, width: 1 },
-                move: { enable: true, speed: 2, direction: "none", random: true }
-            },
-            interactivity: {
-                detect_on: "canvas",
-                events: {
-                    onhover: { enable: true, mode: "repulse" },
-                    onclick: { enable: true, mode: "push" }
+        // ---------- 原有 V2 轮播 ----------
+        function initCarouselNodes() {
+            const track = document.getElementById('carouselTrack');
+            if (!track) return;
+            if (carouselCardNodes[0] === null) {
+                for (let i = 0; i < 3; i++) {
+                    const card = document.createElement('div');
+                    card.className = 'category-carousel-card';
+                    card.innerHTML = `<img src="" alt="" loading="lazy"><div class="card-title"></div>`;
+                    track.appendChild(card);
+                    carouselCardNodes[i] = card;
                 }
             }
-        });
-    }
-
-    // ===== 轮播 =====
-    function initCarouselNodes() {
-        const track = document.getElementById('carouselTrack');
-        if (!track) return;
-        if (carouselCardNodes[0] === null) {
-            for (let i = 0; i < 3; i++) {
-                const card = document.createElement('div');
-                card.className = 'category-carousel-card';
-                card.innerHTML = `<img src="" alt="" loading="lazy"><div class="card-title"></div>`;
-                track.appendChild(card);
-                carouselCardNodes[i] = card;
-            }
         }
-    }
 
-    function updateCarouselCards() {
-        const total = categories.length;
-        const prevIndex = (carouselIndex - 1 + total) % total;
-        const nextIndex = (carouselIndex + 1) % total;
-        const catsToShow = [
-            { cat: categories[prevIndex], position: 'left' },
-            { cat: categories[carouselIndex], position: 'center' },
-            { cat: categories[nextIndex], position: 'right' }
-        ];
-        catsToShow.forEach((item, idx) => {
-            const card = carouselCardNodes[idx];
-            if (!card) return;
-            card.className = `category-carousel-card ${item.position}`;
-            const img = card.querySelector('img');
-            setImageWithFallback(img, item.cat.cover);
-            const titleDiv = card.querySelector('.card-title');
-            titleDiv.textContent = item.cat.title;
-            if (item.position === 'center') card.onclick = () => openCategoryWorks(item.cat.id);
-            else card.onclick = null;
-        });
-    }
+        function updateCarouselCards() {
+            const total = categories.length;
+            const prevIndex = (carouselIndex - 1 + total) % total;
+            const nextIndex = (carouselIndex + 1) % total;
+            const catsToShow = [
+                { cat: categories[prevIndex], position: 'left' },
+                { cat: categories[carouselIndex], position: 'center' },
+                { cat: categories[nextIndex], position: 'right' }
+            ];
+            catsToShow.forEach((item, idx) => {
+                const card = carouselCardNodes[idx];
+                if (!card) return;
+                card.className = `category-carousel-card ${item.position}`;
+                const img = card.querySelector('img');
+                setImageWithFallback(img, item.cat.cover);
+                const titleDiv = card.querySelector('.card-title');
+                titleDiv.textContent = item.cat.title;
+                if (item.position === 'center') card.onclick = () => openCategoryWorks(item.cat.id);
+                else card.onclick = null;
+            });
+        }
 
-    function renderCarouselWithTransition() {
-        const track = document.getElementById('carouselTrack');
-        if (!track) return;
-        gsap.to(track, { opacity: 0, duration: 0.2, onComplete: () => {
-            updateCarouselCards();
-            gsap.to(track, { opacity: 1, duration: 0.3 });
-        }});
-    }
+        function renderCarouselWithTransition() {
+            const track = document.getElementById('carouselTrack');
+            if (!track) return;
+            gsap.to(track, { opacity: 0, duration: 0.2, onComplete: () => {
+                updateCarouselCards();
+                gsap.to(track, { opacity: 1, duration: 0.3 });
+            }});
+        }
 
-    function nextCategory() { carouselIndex = (carouselIndex + 1) % categories.length; renderCarouselWithTransition(); }
-    function prevCategory() { carouselIndex = (carouselIndex - 1 + categories.length) % categories.length; renderCarouselWithTransition(); }
-    function renderCarousel() { initCarouselNodes(); updateCarouselCards(); const t = document.getElementById('carouselTrack'); if (t) t.style.opacity = 1; }
+        function nextCategory() { carouselIndex = (carouselIndex + 1) % categories.length; renderCarouselWithTransition(); }
+        function prevCategory() { carouselIndex = (carouselIndex - 1 + categories.length) % categories.length; renderCarouselWithTransition(); }
+        function renderCarousel() { initCarouselNodes(); updateCarouselCards(); const t = document.getElementById('carouselTrack'); if (t) t.style.opacity = 1; }
 
-    // ===== 打开分类（含卡片 stagger 入场动画） =====
-    function openCategoryWorks(catId) {
-        const category = categories.find(c => c.id === catId);
-        if (!category) return;
-        currentCategoryWorks = category.works;
-        const overlay = document.getElementById('worksOverlay');
-        const grid = document.getElementById('worksGrid');
+        // ---------- 原有 V2 打开分类 ----------
+        function openCategoryWorks(catId) {
+            const category = categories.find(c => c.id === catId);
+            if (!category) return;
+            currentCategoryWorks = category.works;
+            const overlay = document.getElementById('worksOverlay');
+            const grid = document.getElementById('worksGrid');
 
-        gsap.killTweensOf(grid.querySelectorAll('.work-card'));
-        grid.innerHTML = '';
+            grid.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+            category.works.forEach((work, idx) => {
+                const card = document.createElement('div');
+                card.className = 'work-card';
+                let imgUrl = work.src;
+                if (!imgUrl && work.images && work.images.length > 0) {
+                    imgUrl = work.images[0];
+                }
+                const img = document.createElement('img');
+                setImageWithFallback(img, imgUrl || '');
+                img.alt = work.title || '作品';
+                img.loading = 'lazy';
+                img.decoding = 'async';
+                let displayTitle = work.title;
+                if (!displayTitle || displayTitle.trim() === '') {
+                    console.warn(`分类 ${catId} 中作品 ${idx+1} 缺少 title`, work);
+                    displayTitle = '(无标题)';
+                }
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'work-title';
+                titleDiv.textContent = displayTitle;
+                card.appendChild(img);
+                card.appendChild(titleDiv);
+                card.addEventListener('click', () => openWorkDetail(idx));
+                fragment.appendChild(card);
+            });
+            grid.appendChild(fragment);
+            overlay.classList.add('active');
+        }
 
-        const fragment = document.createDocumentFragment();
-        category.works.forEach((work, idx) => {
-            const card = document.createElement('div');
-            card.className = 'work-card';
-            let imgUrl = work.src;
-            if (!imgUrl && work.images && work.images.length > 0) {
-                imgUrl = work.images[0];
-            }
-            const img = document.createElement('img');
-            setImageWithFallback(img, imgUrl || '');
-            img.alt = work.title || '作品';
-            img.loading = 'lazy';
-            img.decoding = 'async';
-            let displayTitle = work.title;
-            if (!displayTitle || displayTitle.trim() === '') {
-                console.warn(`分类 ${catId} 中作品 ${idx+1} 缺少 title`, work);
-                displayTitle = '(无标题)';
-            }
-            const titleDiv = document.createElement('div');
-            titleDiv.className = 'work-title';
-            titleDiv.textContent = displayTitle;
-            card.appendChild(img);
-            card.appendChild(titleDiv);
-            card.addEventListener('click', () => openWorkDetail(idx));
-            fragment.appendChild(card);
-        });
-        grid.appendChild(fragment);
-        overlay.classList.add('active');
+        // ================================================================
+        //  ★★★ 核心优化：作品详情多图加载（预加载所有图片） ★★★
+        // ================================================================
+        let currentDetailImages = [];
+        let currentDetailImageIndex = 0;
+        let detailActive = false;
+        let detailImageCache = {}; // 图片缓存对象
 
-        // ---- 卡片入场动画（stagger 0.06s） ----
-        const cards = grid.querySelectorAll('.work-card');
-        gsap.set(cards, { opacity: 0, y: 24 });
-        gsap.to(cards, {
-            opacity: 1,
-            y: 0,
-            stagger: 0.06,
-            duration: 0.55,
-            ease: 'power2.out',
-            overwrite: 'auto'
-        });
-    }
+        // 预加载多图作品的所有图片
+        function preloadDetailImages(images) {
+            if (!images || images.length === 0) return;
+            images.forEach(url => {
+                if (!detailImageCache[url]) {
+                    const img = new Image();
+                    img.src = url;
+                    detailImageCache[url] = img;
+                }
+            });
+        }
 
-    // ===== 作品详情 =====
-    let currentDetailImages = [];
-    let currentDetailImageIndex = 0;
-    let detailActive = false;
+        function openWorkDetail(index) {
+            const work = currentCategoryWorks[index];
+            if (!work) return;
+            const images = work.images && work.images.length ? work.images : [work.src];
+            currentDetailImages = images;
+            currentDetailImageIndex = 0;
 
-    function openWorkDetail(index) {
-        const work = currentCategoryWorks[index];
-        if (!work) return;
-        const images = work.images && work.images.length ? work.images : [work.src];
-        currentDetailImages = images;
-        currentDetailImageIndex = 0;
+            // ★ 优化：立即预加载所有图片
+            preloadDetailImages(images);
 
-        const container = document.getElementById('detailContainer');
-        const renderDetail = () => {
-            const linkButton = work.link ? `<a href="${work.link}" target="_blank" class="work-detail-link">试听 <i class="fas fa-external-link-alt"></i></a>` : '';
-            const hasMultiple = images.length > 1;
-            const arrows = hasMultiple ? `<div class="carousel-arrow-detail left" id="carouselPrev">‹</div><div class="carousel-arrow-detail right" id="carouselNext">›</div><div class="carousel-indicators" id="carouselIndicators"></div>` : '';
-            container.innerHTML = `
-                <div class="detail-image">
-                    <img class="carousel-img" id="carouselMainImg" src="${escapeHtml(images[0])}" alt="${escapeHtml(work.title)}" loading="lazy" decoding="async">
-                    ${arrows}
-                </div>
-                <div class="detail-info">
-                    <h2>${escapeHtml(work.title)}</h2>
-                    <p>${formatDescription(work.description)}</p>
-                    ${linkButton}
-                </div>
-            `;
-            if (hasMultiple) {
-                const indicatorsContainer = document.getElementById('carouselIndicators');
-                for (let i = 0; i < images.length; i++) {
-                    const dot = document.createElement('div');
-                    dot.className = `carousel-dot ${i === currentDetailImageIndex ? 'active' : ''}`;
-                    dot.addEventListener('click', () => {
-                        currentDetailImageIndex = i;
+            const container = document.getElementById('detailContainer');
+            const renderDetail = () => {
+                const linkButton = work.link ? `<a href="${work.link}" target="_blank" class="work-detail-link">试听 <i class="fas fa-external-link-alt"></i></a>` : '';
+                const hasMultiple = images.length > 1;
+                const arrows = hasMultiple ? `<div class="carousel-arrow-detail left" id="carouselPrev">‹</div><div class="carousel-arrow-detail right" id="carouselNext">›</div><div class="carousel-indicators" id="carouselIndicators"></div>` : '';
+                container.innerHTML = `
+                    <div class="detail-image">
+                        <img class="carousel-img" id="carouselMainImg" src="${escapeHtml(images[0])}" alt="${escapeHtml(work.title)}" loading="lazy" decoding="async">
+                        ${arrows}
+                    </div>
+                    <div class="detail-info">
+                        <h2>${escapeHtml(work.title)}</h2>
+                        <p>${formatDescription(work.description)}</p>
+                        ${linkButton}
+                    </div>
+                `;
+                if (hasMultiple) {
+                    const indicatorsContainer = document.getElementById('carouselIndicators');
+                    for (let i = 0; i < images.length; i++) {
+                        const dot = document.createElement('div');
+                        dot.className = `carousel-dot ${i === currentDetailImageIndex ? 'active' : ''}`;
+                        dot.addEventListener('click', () => {
+                            currentDetailImageIndex = i;
+                            updateDetailImage();
+                        });
+                        indicatorsContainer.appendChild(dot);
+                    }
+                    const prevBtn = document.getElementById('carouselPrev');
+                    const nextBtn = document.getElementById('carouselNext');
+                    if (prevBtn) prevBtn.addEventListener('click', () => {
+                        currentDetailImageIndex = (currentDetailImageIndex - 1 + images.length) % images.length;
                         updateDetailImage();
                     });
-                    indicatorsContainer.appendChild(dot);
+                    if (nextBtn) nextBtn.addEventListener('click', () => {
+                        currentDetailImageIndex = (currentDetailImageIndex + 1) % images.length;
+                        updateDetailImage();
+                    });
                 }
-                const prevBtn = document.getElementById('carouselPrev');
-                const nextBtn = document.getElementById('carouselNext');
-                if (prevBtn) prevBtn.addEventListener('click', () => {
-                    currentDetailImageIndex = (currentDetailImageIndex - 1 + images.length) % images.length;
-                    updateDetailImage();
-                });
-                if (nextBtn) nextBtn.addEventListener('click', () => {
-                    currentDetailImageIndex = (currentDetailImageIndex + 1) % images.length;
-                    updateDetailImage();
-                });
-            }
-        };
+            };
 
-        const updateDetailImage = () => {
-            const imgEl = document.getElementById('carouselMainImg');
-            if (!imgEl) return;
-            gsap.to(imgEl, { opacity: 0, duration: 0.15, onComplete: () => {
-                setImageWithFallback(imgEl, currentDetailImages[currentDetailImageIndex]);
-                imgEl.onload = () => gsap.to(imgEl, { opacity: 1, duration: 0.2 });
+            // ★ 优化：切换时直接从缓存取图，无需等待加载
+            const updateDetailImage = () => {
+                const imgEl = document.getElementById('carouselMainImg');
+                if (!imgEl) return;
+                const targetUrl = currentDetailImages[currentDetailImageIndex];
+                // 从缓存获取预加载的图片
+                const cachedImg = detailImageCache[targetUrl];
+                if (cachedImg && cachedImg.complete && cachedImg.naturalWidth > 0) {
+                    // 缓存有效，直接使用
+                    gsap.to(imgEl, { opacity: 0, duration: 0.15, onComplete: () => {
+                        imgEl.src = targetUrl;
+                        gsap.to(imgEl, { opacity: 1, duration: 0.2 });
+                    }});
+                } else {
+                    // 降级方案：使用 setImageWithFallback
+                    gsap.to(imgEl, { opacity: 0, duration: 0.15, onComplete: () => {
+                        setImageWithFallback(imgEl, targetUrl);
+                        imgEl.onload = () => gsap.to(imgEl, { opacity: 1, duration: 0.2 });
+                    }});
+                }
+                // 更新指示点
                 const dots = document.querySelectorAll('.carousel-dot');
                 dots.forEach((dot, idx) => dot.classList.toggle('active', idx === currentDetailImageIndex));
-            }});
-        };
+            };
 
-        renderDetail();
-        const overlay = document.getElementById('detailOverlay');
-        overlay.classList.add('active');
-        detailActive = true;
+            renderDetail();
+            const overlay = document.getElementById('detailOverlay');
+            overlay.classList.add('active');
+            detailActive = true;
 
-        const keyHandler = (e) => {
-            if (!detailActive) return;
-            if (e.key === 'Escape') {
-                closeDetailOverlay();
-            } else if (e.key === 'ArrowLeft') {
-                if (currentDetailImages.length > 1) {
-                    currentDetailImageIndex = (currentDetailImageIndex - 1 + currentDetailImages.length) % currentDetailImages.length;
-                    updateDetailImage();
+            const keyHandler = (e) => {
+                if (!detailActive) return;
+                if (e.key === 'Escape') {
+                    closeDetailOverlay();
+                } else if (e.key === 'ArrowLeft') {
+                    if (currentDetailImages.length > 1) {
+                        currentDetailImageIndex = (currentDetailImageIndex - 1 + currentDetailImages.length) % currentDetailImages.length;
+                        updateDetailImage();
+                    }
+                } else if (e.key === 'ArrowRight') {
+                    if (currentDetailImages.length > 1) {
+                        currentDetailImageIndex = (currentDetailImageIndex + 1) % currentDetailImages.length;
+                        updateDetailImage();
+                    }
                 }
-            } else if (e.key === 'ArrowRight') {
-                if (currentDetailImages.length > 1) {
-                    currentDetailImageIndex = (currentDetailImageIndex + 1) % currentDetailImages.length;
-                    updateDetailImage();
+            };
+            window.addEventListener('keydown', keyHandler);
+            overlay._keyHandler = keyHandler;
+
+            const closeDetailHandler = (e) => {
+                if (e.target === overlay) {
+                    closeDetailOverlay();
                 }
+            };
+            overlay.addEventListener('click', closeDetailHandler);
+            overlay._closeHandler = closeDetailHandler;
+        }
+
+        function closeDetailOverlay() {
+            const overlay = document.getElementById('detailOverlay');
+            overlay.classList.remove('active');
+            detailActive = false;
+            // 关闭时清理缓存（可选，防止内存泄漏）
+            // detailImageCache = {};
+            if (overlay._keyHandler) {
+                window.removeEventListener('keydown', overlay._keyHandler);
+                delete overlay._keyHandler;
             }
-        };
-        window.addEventListener('keydown', keyHandler);
-        overlay._keyHandler = keyHandler;
-
-        const closeDetailHandler = (e) => {
-            if (e.target === overlay) {
-                closeDetailOverlay();
+            if (overlay._closeHandler) {
+                overlay.removeEventListener('click', overlay._closeHandler);
+                delete overlay._closeHandler;
             }
-        };
-        overlay.addEventListener('click', closeDetailHandler);
-        overlay._closeHandler = closeDetailHandler;
-    }
-
-    function closeDetailOverlay() {
-        const overlay = document.getElementById('detailOverlay');
-        overlay.classList.remove('active');
-        detailActive = false;
-        if (overlay._keyHandler) {
-            window.removeEventListener('keydown', overlay._keyHandler);
-            delete overlay._keyHandler;
         }
-        if (overlay._closeHandler) {
-            overlay.removeEventListener('click', overlay._closeHandler);
-            delete overlay._closeHandler;
+        document.getElementById('closeDetail').addEventListener('click', closeDetailOverlay);
+
+        // ---------- 原有 V2 主初始化（完全未改动） ----------
+        function initFullSite() {
+            initParticles();
+            document.getElementById('storyTextArea').innerHTML = appData.story;
+            document.getElementById('mainName').innerText = appData.studioName;
+            document.getElementById('sloganText').innerText = appData.slogan;
+            categories = appData.categories;
+            carouselIndex = 0;
+            renderCarousel();
+            document.getElementById('carouselLeft').addEventListener('click', prevCategory);
+            document.getElementById('carouselRight').addEventListener('click', nextCategory);
+
+            const logo = document.getElementById('mainLogo');
+            const nameSpan = document.getElementById('mainName');
+            const brandWrapper = document.getElementById('brandWrapper');
+            gsap.set(logo, { opacity: 0, scale: 0.95 });
+            gsap.set(nameSpan, { opacity: 0, x: 10 });
+            gsap.set(brandWrapper, { x: 0 });
+            const tl = gsap.timeline();
+            tl.to(logo, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out", delay: 0.3 })
+              .to(logo, { scale: 1.02, duration: 0.8, repeat: 1, yoyo: true, ease: "power1.inOut", onComplete: () => gsap.set(logo, { scale: 1 }) }, "-=0.8")
+              .to(brandWrapper, { x: -180, duration: 1.2, ease: "power3.out" }, "+=1")
+              .to(nameSpan, { opacity: 1, x: 0, duration: 1.2, ease: "power3.out" }, "<")
+              .to('#sloganText', { opacity: 1, y: 0, boxShadow: "0 0 18px rgba(200,100,255,0.5)", duration: 0.6, ease: "power2.out" }, "+=0.4")
+              .to('#scrollHint', { width: '80%', duration: 1, ease: "power1.inOut" }, "-=0.4")
+              .call(() => { if (window.scrollY < 200) startBreathingGlow(); });
+
+            let glowAnimation = null, isGlowing = true;
+            function startBreathingGlow() {
+                if (glowAnimation) glowAnimation.kill();
+                glowAnimation = gsap.to(logo, { duration: 1.8, filter: "drop-shadow(0 0 12px #c084fc) drop-shadow(0 0 18px #f0a6ff)", repeat: -1, yoyo: true, ease: "power1.inOut", paused: true });
+                if (window.scrollY < 200 && isGlowing) glowAnimation.play();
+            }
+            function stopBreathingGlow() { isGlowing = false; if (glowAnimation) { glowAnimation.kill(); glowAnimation = null; } gsap.set(logo, { filter: "none" }); }
+            function resumeBreathingGlow() { if (window.scrollY >= 200) return; if (!isGlowing) { isGlowing = true; startBreathingGlow(); } else if (glowAnimation && glowAnimation.paused()) glowAnimation.play(); }
+            window.addEventListener('scroll', () => { if (window.scrollY < 200) resumeBreathingGlow(); else stopBreathingGlow(); });
+
+            // 原有粒子消散动画
+            const heroSection = document.getElementById('hero');
+            const slogan = document.getElementById('sloganText');
+            const fxCanvas = document.getElementById('fx-canvas');
+            let ctx = fxCanvas.getContext('2d');
+            let currentParticles = [];
+            let dissolveAnimationFrame = null;
+            function resizeFxCanvas() { fxCanvas.width = window.innerWidth; fxCanvas.height = window.innerHeight; }
+            window.addEventListener('resize', resizeFxCanvas);
+            resizeFxCanvas();
+            class Particle { constructor(x,y,c,s,vx,vy) { this.x=x; this.y=y; this.originX=x; this.originY=y; this.color=c; this.size=s; this.vx=vx; this.vy=vy; this.alpha=1; } update(p) { const e=1-Math.pow(1-p,3); this.x=this.originX+this.vx*180*e; this.y=this.originY+this.vy*180*e; this.alpha=1-e; } draw(ctx) { ctx.save(); ctx.globalAlpha=this.alpha; ctx.fillStyle=this.color; ctx.shadowBlur=6; ctx.shadowColor='#c084fc'; ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill(); ctx.restore(); } }
+            function generateParticlesFromElement(el, n=80) { if(!el) return []; const r=el.getBoundingClientRect(); if(r.width===0||r.height===0) return []; const c=document.createElement('canvas'); c.width=r.width; c.height=r.height; const ct=c.getContext('2d'); let cols=[]; if(el.tagName==='IMG'&&el.complete&&el.naturalWidth>0){ ct.drawImage(el,0,0,r.width,r.height); const d=ct.getImageData(0,0,r.width,r.height).data; for(let i=0;i<n;i++){ const px=Math.floor(Math.random()*r.width), py=Math.floor(Math.random()*r.height), idx=(py*r.width+px)*4; cols.push(`rgb(${d[idx]},${d[idx+1]},${d[idx+2]})`); } } else { const bc=['#e0b0ff','#c084fc','#a855f7','#d946ef','#f0a6ff']; for(let i=0;i<n;i++) cols.push(bc[Math.floor(Math.random()*bc.length)]); } const p=[]; for(let i=0;i<n;i++){ const x=r.left+Math.random()*r.width, y=r.top+Math.random()*r.height, a=Math.random()*Math.PI*2, sp=0.4+Math.random()*0.8, vx=Math.cos(a)*sp, vy=Math.sin(a)*sp, col=cols[i%cols.length], sz=2+Math.random()*5; p.push(new Particle(x,y,col,sz,vx,vy)); } return p; }
+            function updateDissolveProgress(prog) { if(!currentParticles.length && prog>0.05){ const lp=generateParticlesFromElement(logo,80), np=generateParticlesFromElement(nameSpan,50), sp=generateParticlesFromElement(slogan,40); currentParticles=[...lp,...np,...sp]; stopBreathingGlow(); } if(currentParticles.length){ for(let p of currentParticles) p.update(prog); const show=prog<0.05; gsap.set([logo,nameSpan,slogan],{opacity:show?1:0,visibility:show?'visible':'hidden'}); if(prog>=0.98){ if(dissolveAnimationFrame) cancelAnimationFrame(dissolveAnimationFrame); dissolveAnimationFrame=null; }else{ startParticleRender(); } } }
+            function startParticleRender(){ if(dissolveAnimationFrame) cancelAnimationFrame(dissolveAnimationFrame); function render(){ if(!ctx) return; ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height); for(let p of currentParticles) p.draw(ctx); dissolveAnimationFrame=requestAnimationFrame(render); } render(); }
+            ScrollTrigger.create({ trigger: heroSection, start:"top top", end:"+=550", scrub:1.2, onUpdate:self=>{ const prog=Math.min(1,Math.max(0,self.progress)); updateDissolveProgress(prog); }, onLeaveBack:()=>{ if(dissolveAnimationFrame) cancelAnimationFrame(dissolveAnimationFrame); dissolveAnimationFrame=null; if(ctx) ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height); currentParticles=[]; gsap.set([logo,nameSpan,slogan],{opacity:1,visibility:'visible'}); if(window.scrollY<200) resumeBreathingGlow(); } });
+
+            // 原有 story & carousel 淡入
+            const storySection = document.getElementById('storySection');
+            ScrollTrigger.create({ trigger: storySection, start:"top 80%", end:"top 20%", scrub:0.8, onUpdate:self=>{ const p=Math.min(1,Math.max(0,self.progress)); const ep=1-Math.pow(1-p,2); storySection.style.opacity=ep; storySection.style.transform=`translateY(${30*(1-ep)}px)`; } });
+            const storyParas = document.querySelectorAll('#storyTextArea p');
+            if(storyParas.length) gsap.fromTo(storyParas, {opacity:0,y:20}, {opacity:1,y:0, stagger:0.2, duration:1, scrollTrigger:{ trigger:'#storySection', start:'top 80%', end:'bottom 70%', scrub:0.5 }});
+            const carouselSection = document.getElementById('carouselSection');
+            ScrollTrigger.create({ trigger: carouselSection, start:"top 80%", end:"top 20%", scrub:0.8, onUpdate:self=>{ const p=Math.min(1,Math.max(0,self.progress)); const ep=1-Math.pow(1-p,2); carouselSection.style.opacity=ep; carouselSection.style.transform=`translateY(${30*(1-ep)}px)`; } });
+            document.getElementById('closeOverlay').addEventListener('click',()=>document.getElementById('worksOverlay').classList.remove('active'));
+
+            // 光标
+            const glowCursor = document.getElementById('cursorGlow');
+            document.addEventListener('mousemove',e=>gsap.set(glowCursor,{left:e.clientX,top:e.clientY}));
+            document.querySelectorAll('a, button, .category-carousel-card, .work-card, .close-overlay, .close-detail, .carousel-arrow').forEach(el=>{
+                el.addEventListener('mouseenter',()=>gsap.to(glowCursor,{width:100,height:100,duration:0.2}));
+                el.addEventListener('mouseleave',()=>gsap.to(glowCursor,{width:60,height:60,duration:0.2}));
+            });
         }
-    }
-    document.getElementById('closeDetail').addEventListener('click', closeDetailOverlay);
 
-    // ===== 主初始化 =====
-    function initFullSite() {
-        initParticles();
-        document.getElementById('storyTextArea').innerHTML = appData.story;
-        document.getElementById('mainName').innerText = appData.studioName;
-        document.getElementById('sloganText').innerText = appData.slogan;
-        categories = appData.categories;
-        carouselIndex = 0;
-        renderCarousel();
-        document.getElementById('carouselLeft').addEventListener('click', prevCategory);
-        document.getElementById('carouselRight').addEventListener('click', nextCategory);
-
-        const logo = document.getElementById('mainLogo');
-        setImageWithFallback(logo, 'images/FTN-logo.webp');
-
-        const nameSpan = document.getElementById('mainName');
-        const brandWrapper = document.getElementById('brandWrapper');
-        gsap.set(logo, { opacity: 0, scale: 0.95 });
-        gsap.set(nameSpan, { opacity: 0, x: 10 });
-        gsap.set(brandWrapper, { x: 0 });
-        const tl = gsap.timeline();
-        tl.to(logo, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out", delay: 0.3 })
-          .to(logo, { scale: 1.02, duration: 0.8, repeat: 1, yoyo: true, ease: "power1.inOut", onComplete: () => gsap.set(logo, { scale: 1 }) }, "-=0.8")
-          .to(brandWrapper, {
-              x: window.innerWidth <= 800 ? -107 : -180,
-              duration: 1.2,
-              ease: "power3.out"
-          }, "+=1")
-          .to(nameSpan, { opacity: 1, x: 0, duration: 1.2, ease: "power3.out" }, "<")
-          .to('#sloganText', { opacity: 1, y: 0, boxShadow: "0 0 18px rgba(200,100,255,0.5)", duration: 0.6, ease: "power2.out" }, "+=0.4")
-          .to('#scrollHint', { width: '80%', duration: 1, ease: "power1.inOut" }, "-=0.4")
-          .call(() => { if (window.scrollY < 200) startBreathingGlow(); });
-
-        let glowAnimation = null, isGlowing = true;
-        function startBreathingGlow() {
-            if (glowAnimation) glowAnimation.kill();
-            glowAnimation = gsap.to(logo, { duration: 1.8, filter: "drop-shadow(0 0 12px #c084fc) drop-shadow(0 0 18px #f0a6ff)", repeat: -1, yoyo: true, ease: "power1.inOut", paused: true });
-            if (window.scrollY < 200 && isGlowing) glowAnimation.play();
-        }
-        function stopBreathingGlow() { isGlowing = false; if (glowAnimation) { glowAnimation.kill(); glowAnimation = null; } gsap.set(logo, { filter: "none" }); }
-        function resumeBreathingGlow() { if (window.scrollY >= 200) return; if (!isGlowing) { isGlowing = true; startBreathingGlow(); } else if (glowAnimation && glowAnimation.paused()) glowAnimation.play(); }
-        window.addEventListener('scroll', () => { if (window.scrollY < 200) resumeBreathingGlow(); else stopBreathingGlow(); });
-
-        // ===== Logo 消散粒子（升级：140 / 90 / 70） =====
-        const heroSection = document.getElementById('hero');
-        const slogan = document.getElementById('sloganText');
-        const fxCanvas = document.getElementById('fx-canvas');
-        let ctx = fxCanvas.getContext('2d');
-        let currentParticles = [];
-        let dissolveAnimationFrame = null;
-        function resizeFxCanvas() { fxCanvas.width = window.innerWidth; fxCanvas.height = window.innerHeight; }
-        window.addEventListener('resize', resizeFxCanvas);
-        resizeFxCanvas();
-        class Particle { constructor(x,y,c,s,vx,vy) { this.x=x; this.y=y; this.originX=x; this.originY=y; this.color=c; this.size=s; this.vx=vx; this.vy=vy; this.alpha=1; } update(p) { const e=1-Math.pow(1-p,3); this.x=this.originX+this.vx*180*e; this.y=this.originY+this.vy*180*e; this.alpha=1-e; } draw(ctx) { ctx.save(); ctx.globalAlpha=this.alpha; ctx.fillStyle=this.color; ctx.shadowBlur=6; ctx.shadowColor='#c084fc'; ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill(); ctx.restore(); } }
-        function generateParticlesFromElement(el, n) { if(!el) return []; const r=el.getBoundingClientRect(); if(r.width===0||r.height===0) return []; const c=document.createElement('canvas'); c.width=r.width; c.height=r.height; const ct=c.getContext('2d'); let cols=[]; if(el.tagName==='IMG'&&el.complete&&el.naturalWidth>0){ ct.drawImage(el,0,0,r.width,r.height); const d=ct.getImageData(0,0,r.width,r.height).data; for(let i=0;i<n;i++){ const px=Math.floor(Math.random()*r.width), py=Math.floor(Math.random()*r.height), idx=(py*r.width+px)*4; cols.push(`rgb(${d[idx]},${d[idx+1]},${d[idx+2]})`); } } else { const bc=['#e0b0ff','#c084fc','#a855f7','#d946ef','#f0a6ff']; for(let i=0;i<n;i++) cols.push(bc[Math.floor(Math.random()*bc.length)]); } const p=[]; for(let i=0;i<n;i++){ const x=r.left+Math.random()*r.width, y=r.top+Math.random()*r.height, a=Math.random()*Math.PI*2, sp=0.4+Math.random()*0.8, vx=Math.cos(a)*sp, vy=Math.sin(a)*sp, col=cols[i%cols.length], sz=2+Math.random()*5; p.push(new Particle(x,y,col,sz,vx,vy)); } return p; }
-        function updateDissolveProgress(prog) { if(!currentParticles.length && prog>0.05){ const lp=generateParticlesFromElement(logo,140); const np=generateParticlesFromElement(nameSpan,90); const sp=generateParticlesFromElement(slogan,70); currentParticles=[...lp,...np,...sp]; stopBreathingGlow(); } if(currentParticles.length){ for(let p of currentParticles) p.update(prog); const show=prog<0.05; gsap.set([logo,nameSpan,slogan],{opacity:show?1:0,visibility:show?'visible':'hidden'}); if(prog>=0.98){ if(dissolveAnimationFrame) cancelAnimationFrame(dissolveAnimationFrame); dissolveAnimationFrame=null; }else{ startParticleRender(); } } }
-        function startParticleRender(){ if(dissolveAnimationFrame) cancelAnimationFrame(dissolveAnimationFrame); function render(){ if(!ctx) return; ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height); for(let p of currentParticles) p.draw(ctx); dissolveAnimationFrame=requestAnimationFrame(render); } render(); }
-        ScrollTrigger.create({ trigger: heroSection, start:"top top", end:"+=550", scrub:1.2, onUpdate:self=>{ const prog=Math.min(1,Math.max(0,self.progress)); updateDissolveProgress(prog); }, onLeaveBack:()=>{ if(dissolveAnimationFrame) cancelAnimationFrame(dissolveAnimationFrame); dissolveAnimationFrame=null; if(ctx) ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height); currentParticles=[]; gsap.set([logo,nameSpan,slogan],{opacity:1,visibility:'visible'}); if(window.scrollY<200) resumeBreathingGlow(); } });
-
-        // ===== 故事 & 轮播淡入 =====
-        const storySection = document.getElementById('storySection');
-        ScrollTrigger.create({ trigger: storySection, start:"top 80%", end:"top 20%", scrub:0.8, onUpdate:self=>{ const p=Math.min(1,Math.max(0,self.progress)); const ep=1-Math.pow(1-p,2); storySection.style.opacity=ep; storySection.style.transform=`translateY(${30*(1-ep)}px)`; } });
-        const storyParas = document.querySelectorAll('#storyTextArea p');
-        if(storyParas.length) gsap.fromTo(storyParas, {opacity:0,y:20}, {opacity:1,y:0, stagger:0.2, duration:1, scrollTrigger:{ trigger:'#storySection', start:'top 80%', end:'bottom 70%', scrub:0.5 }});
-        const carouselSection = document.getElementById('carouselSection');
-        ScrollTrigger.create({ trigger: carouselSection, start:"top 80%", end:"top 20%", scrub:0.8, onUpdate:self=>{ const p=Math.min(1,Math.max(0,self.progress)); const ep=1-Math.pow(1-p,2); carouselSection.style.opacity=ep; carouselSection.style.transform=`translateY(${30*(1-ep)}px)`; } });
-        document.getElementById('closeOverlay').addEventListener('click',()=>document.getElementById('worksOverlay').classList.remove('active'));
-
-        // ===== 光标 =====
-        const glowCursor = document.getElementById('cursorGlow');
-        document.addEventListener('mousemove',e=>gsap.set(glowCursor,{left:e.clientX,top:e.clientY}));
-        document.querySelectorAll('a, button, .category-carousel-card, .work-card, .close-overlay, .close-detail, .carousel-arrow').forEach(el=>{
-            el.addEventListener('mouseenter',()=>gsap.to(glowCursor,{width:100,height:100,duration:0.2}));
-            el.addEventListener('mouseleave',()=>gsap.to(glowCursor,{width:60,height:60,duration:0.2}));
-        });
-    }
-
-    loadData();
-</script>
+        loadData();
+    </script>
 </body>
 </html>
