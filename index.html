@@ -502,7 +502,8 @@
         <section class="hero" id="hero">
             <div class="hero-center">
                 <div class="brand-wrapper" id="brandWrapper">
-                    <img src="https://images.ftn-studio.top/images/FTN-logo.webp" alt="FTN Logo" class="logo-img" id="mainLogo">
+                    <!-- 直接指定 src 路径，避免 JS 动态设置失败 -->
+                    <img src="images/FTN-logo.webp" alt="FTN Logo" class="logo-img" id="mainLogo">
                     <span class="logo-text" id="mainName">FTN STUDIO</span>
                 </div>
             </div>
@@ -534,9 +535,9 @@
 
     <script>
         // ================================================================
-        //  CDN 配置
+        //  CDN 配置（留空则使用本地相对路径）
         // ================================================================
-        const IMAGE_BASE_URL = 'https://images.ftn-studio.top/';  // 请按需修改
+        const IMAGE_BASE_URL = '';  // 如需 CDN 请填写地址，如 'https://images.ftn-studio.top/'
 
         // ---------- 原有 V2 全局变量 ----------
         let appData = null;
@@ -806,7 +807,7 @@
         let currentDetailImages = [];
         let currentDetailImageIndex = 0;
         let detailActive = false;
-        let detailImageCache = {}; // 图片缓存对象
+        let detailImageCache = {};
 
         // 预加载多图作品的所有图片
         function preloadDetailImages(images) {
@@ -827,7 +828,7 @@
             currentDetailImages = images;
             currentDetailImageIndex = 0;
 
-            // ★ 优化：立即预加载所有图片
+            // 立即预加载所有图片
             preloadDetailImages(images);
 
             const container = document.getElementById('detailContainer');
@@ -870,27 +871,23 @@
                 }
             };
 
-            // ★ 优化：切换时直接从缓存取图，无需等待加载
+            // 切换图片时从缓存读取
             const updateDetailImage = () => {
                 const imgEl = document.getElementById('carouselMainImg');
                 if (!imgEl) return;
                 const targetUrl = currentDetailImages[currentDetailImageIndex];
-                // 从缓存获取预加载的图片
                 const cachedImg = detailImageCache[targetUrl];
                 if (cachedImg && cachedImg.complete && cachedImg.naturalWidth > 0) {
-                    // 缓存有效，直接使用
                     gsap.to(imgEl, { opacity: 0, duration: 0.15, onComplete: () => {
                         imgEl.src = targetUrl;
                         gsap.to(imgEl, { opacity: 1, duration: 0.2 });
                     }});
                 } else {
-                    // 降级方案：使用 setImageWithFallback
                     gsap.to(imgEl, { opacity: 0, duration: 0.15, onComplete: () => {
                         setImageWithFallback(imgEl, targetUrl);
                         imgEl.onload = () => gsap.to(imgEl, { opacity: 1, duration: 0.2 });
                     }});
                 }
-                // 更新指示点
                 const dots = document.querySelectorAll('.carousel-dot');
                 dots.forEach((dot, idx) => dot.classList.toggle('active', idx === currentDetailImageIndex));
             };
@@ -932,8 +929,6 @@
             const overlay = document.getElementById('detailOverlay');
             overlay.classList.remove('active');
             detailActive = false;
-            // 关闭时清理缓存（可选，防止内存泄漏）
-            // detailImageCache = {};
             if (overlay._keyHandler) {
                 window.removeEventListener('keydown', overlay._keyHandler);
                 delete overlay._keyHandler;
@@ -945,7 +940,7 @@
         }
         document.getElementById('closeDetail').addEventListener('click', closeDetailOverlay);
 
-        // ---------- 原有 V2 主初始化（完全未改动） ----------
+        // ---------- 原有 V2 主初始化（修复移动端 Logo 偏移 + 避免覆盖 src） ----------
         function initFullSite() {
             initParticles();
             document.getElementById('storyTextArea').innerHTML = appData.story;
@@ -958,6 +953,11 @@
             document.getElementById('carouselRight').addEventListener('click', nextCategory);
 
             const logo = document.getElementById('mainLogo');
+            // 仅在 src 为空时设置，避免覆盖 HTML 中已指定的路径
+            if (!logo.src || logo.src === '') {
+                setImageWithFallback(logo, 'images/FTN-logo.webp');
+            }
+
             const nameSpan = document.getElementById('mainName');
             const brandWrapper = document.getElementById('brandWrapper');
             gsap.set(logo, { opacity: 0, scale: 0.95 });
@@ -966,7 +966,12 @@
             const tl = gsap.timeline();
             tl.to(logo, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out", delay: 0.3 })
               .to(logo, { scale: 1.02, duration: 0.8, repeat: 1, yoyo: true, ease: "power1.inOut", onComplete: () => gsap.set(logo, { scale: 1 }) }, "-=0.8")
-              .to(brandWrapper, { x: -180, duration: 1.2, ease: "power3.out" }, "+=1")
+              // 修复移动端偏移：响应式判断
+              .to(brandWrapper, {
+                  x: window.innerWidth <= 800 ? -107 : -180,
+                  duration: 1.2,
+                  ease: "power3.out"
+              }, "+=1")
               .to(nameSpan, { opacity: 1, x: 0, duration: 1.2, ease: "power3.out" }, "<")
               .to('#sloganText', { opacity: 1, y: 0, boxShadow: "0 0 18px rgba(200,100,255,0.5)", duration: 0.6, ease: "power2.out" }, "+=0.4")
               .to('#scrollHint', { width: '80%', duration: 1, ease: "power1.inOut" }, "-=0.4")
