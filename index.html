@@ -631,11 +631,15 @@
             return newObj;
         }
 
-        // ---------- 原有 V2 数据加载 ----------
-        async function loadData() {
+        // ================================================================
+        //  ★★★ 修改：loadData 增加重试机制 ★★★
+        // ================================================================
+        async function loadData(retryCount = 0) {
+            const maxRetries = 3;
             updateLoadingBar(10);
             try {
                 const res = await fetch('data.json?_=' + Date.now());
+                if (!res.ok) throw new Error('HTTP ' + res.status);
                 let rawData = await res.json();
                 appData = replaceImageUrls(rawData);
                 updateLoadingBar(40);
@@ -647,9 +651,19 @@
                 }, 200);
                 initFullSite();
             } catch(e) {
-                console.warn('加载 data.json 失败，使用占位数据');
-                appData = getPlaceholderData();
-                initFullSite();
+                console.warn('加载 data.json 失败，重试次数:', retryCount, e);
+                if (retryCount < maxRetries) {
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    loadData(retryCount + 1);
+                } else {
+                    console.error('data.json 加载失败，已重试 ' + maxRetries + ' 次');
+                    appData = getPlaceholderData();
+                    const storyArea = document.getElementById('storyTextArea');
+                    if (storyArea) {
+                        storyArea.innerHTML = '<p style="color:#f0a6ff;">⚠️ 内容加载失败，请检查网络后刷新页面重试</p>';
+                    }
+                    initFullSite();
+                }
             }
         }
 
@@ -680,11 +694,14 @@
             }
         }
 
+        // ================================================================
+        //  ★★★ 修改：getPlaceholderData 明确提示加载失败 ★★★
+        // ================================================================
         function getPlaceholderData() {
             return {
                 studioName: "FTN STUDIO",
                 slogan: "致力于向世界展示不务正业的热爱",
-                story: "<p>花汐夜（Flower·Tidal·Night）...</p>",
+                story: "<p>⚠️ 内容加载失败，请刷新页面重试</p>",
                 storyImage: "images/story.webp",
                 categories: []
             };
